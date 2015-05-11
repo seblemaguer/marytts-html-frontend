@@ -1,6 +1,10 @@
 
+/* Mary global information */
 var mary_host = "localhost";
-var mary_port = "8080";
+var mary_port = "59125";
+
+var current_voice = 0;
+var current_locale = 0;
 
 function getCurrentLocale()
 {
@@ -8,10 +12,16 @@ function getCurrentLocale()
     var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentLocale";
     
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", base_url, false); // FIXME: add locale !
+    xmlhttp.open("GET", base_url, true);
     xmlhttp.send();
+
     
-    return JSON.parse(xmlhttp.responseText)['result'];
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            current_locale = JSON.parse(xmlhttp.responseText)['result'];
+            listLocales();
+        }
+    }
 }
 
 
@@ -20,12 +30,18 @@ function getCurrentVoice()
     var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentVoice";
     
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", base_url, false); // FIXME: add locale !
+    xmlhttp.open("GET", base_url, true);
     xmlhttp.send();
+
     
-    return JSON.parse(xmlhttp.responseText)['result'];
-    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            current_voice = JSON.parse(xmlhttp.responseText)['result'];
+            listVoices();
+        }
+    }
 }
+
 function listLocales()
 {
         
@@ -33,13 +49,11 @@ function listLocales()
     
     // Build post request
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", base_url, true); // FIXME: add locale !
+    xmlhttp.open("GET", base_url, true);
     xmlhttp.send();
     
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-            var cur_locale = getCurrentLocale();
             
             var result = JSON.parse(xmlhttp.responseText)['result'];
             
@@ -55,7 +69,7 @@ function listLocales()
 		        radio_item.id = value;
 		        radio_item.value = value;
 
-                if (value == cur_locale) {
+                if (value == current_locale) {
 		            // radioItem1.defaultChecked = true; 
 		            radio_item.checked = true;
                 }
@@ -86,7 +100,6 @@ function listVoices() {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 
-            var current_voice = getCurrentVoice();
             var result = JSON.parse(xmlhttp.responseText)['result'];
             var select = document.getElementsByName("voices")[0];
             select.options.length = 0;
@@ -108,6 +121,6 @@ function listVoices() {
 }
 
 function initialisation() {
-    listVoices();
-    listLocales();
+    getCurrentLocale();
+    getCurrentVoice();
 }
