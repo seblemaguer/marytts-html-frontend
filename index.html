@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>MaryTTS demonstration interface</title>
+    <meta name="author" content="Sébastien Le Maguer">
+    
+    <link rel="stylesheet" href="style.css" />
+    
+    <!-- wavesurfer.js -->
+    <script src="js/wavesurfer.js/src/wavesurfer.js"></script>
+    <script src="js/wavesurfer.js/src/util.js"></script>
+    <script src="js/wavesurfer.js/src/webaudio.js"></script>
+    <script src="js/wavesurfer.js/src/mediaelement.js"></script>
+    <script src="js/wavesurfer.js/src/drawer.js"></script>
+    <script src="js/wavesurfer.js/src/drawer.canvas.js"></script>
+
+    <script src="js/wavesurfer.js/plugin/wavesurfer.regions.js"></script>
+    
+    <script src="js/mary_part.js"></script>
+    <script src="js/audio_part.js"></script>
+  </head>
+
+  <body onLoad="initialisation();">
+    <div id="header">
+      <img src="img/marylogo.png" />
+    </div>
+    <div id="content">
+      
+      <div id="synth_area">
+        <div id="text_area">
+          <fieldset>
+            <legend>Text to synthesize</legend>
+            <textarea name="text_to_synth"></textarea>
+          </fieldset>
+        </div>
+        <div id="voice_choices">
+          <fieldset>
+            <legend>Voices area</legend>
+            <p id="locales_area">
+            </p>
+            <select name="voices" size="10">
+            </select>
+          </fieldset>     
+        </div>
+      </div>
+
+      <div id="validation_part">
+        <button name="synth" onclick="synth();">Synthesize</button> 
+        <fieldset name="output_level">
+          <legend>Output level</legend>
+          <input type = "radio"
+                 name = "output_level"
+                 id = "none"
+                 value = "none"
+                 checked = "checked" />
+          <label for = "none">none</label>
+          
+          <input type = "radio"
+                 name = "output_level"
+                 id = "info"
+                 value = "info" />
+          <label for = "info">info</label>
+          
+          <input type = "radio"
+                 name = "output_level"
+                 id = "debug"
+                 value = "debug" />
+          <label for = "debug">debug</label>
+        </fieldset>
+      </div>
+      
+      
+      <div id="results_area">
+        <div id="audio_area">
+          <div id="waveform">
+            <div class="progress progress-striped active" id="progress-bar">
+              <div class="progress-bar progress-bar-info"></div>
+            </div>
+            
+          </div>
+            <div id="controls">
+                <button name="play" style="disabled:true" onclick="play();">Replay</button>
+                <button name="save" style="disabled:true">Save</button> 
+            </div>
+          
+        </div>
+        <div id="debug_area" style="display:none;">
+          <fieldset>
+            <legend>Server output</legend>
+            <textarea name="debug" id="debug"></textarea>
+          </fieldset>
+        </div>
+      </div>
+    </div>      
+  </body>
+</html>
