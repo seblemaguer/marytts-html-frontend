@@ -118,8 +118,6 @@ function play (){
 
 
 function synth () {
-
-    
     var base_url = "http://" + mary_host + ":" + mary_port + "/synthesize";
 
     //
@@ -148,7 +146,7 @@ function synth () {
 
             var result = JSON.parse(xmlhttp.responseText);
             
-            //
+            // Change the output level
             if (! document.getElementById('none').checked)
             {
                 document.getElementById('debug_area').style.display = 'inline';
@@ -174,10 +172,8 @@ function synth () {
                     //     document.getElementsByName('debug')[0].value = xmlhttp_signal.responseText;
                     // }
                     wavesurfer.loadBlob(xmlhttp_signal.response);
-            
                 }
             }
-
         }
     }
 }
