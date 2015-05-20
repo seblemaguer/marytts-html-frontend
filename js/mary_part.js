@@ -6,41 +6,10 @@ var mary_port = "59125";
 var current_voice = 0;
 var current_locale = 0;
 
-function getCurrentLocale()
-{
-            
-    var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentLocale";
-    
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", base_url, true);
-    xmlhttp.send();
 
-    
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            current_locale = JSON.parse(xmlhttp.responseText)['result'];
-            listLocales();
-        }
-    }
-}
-
-
-function getCurrentVoice()
-{
-    var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentVoice";
-    
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", base_url, true);
-    xmlhttp.send();
-
-    
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            current_voice = JSON.parse(xmlhttp.responseText)['result'];
-            listVoices();
-        }
-    }
-}
+/***********************************************************************************
+ ** Listing
+ ***********************************************************************************/
 
 function listLocales()
 {
@@ -120,7 +89,71 @@ function listVoices() {
     }
 }
 
+/***********************************************************************************
+ ** Initialisation
+ ***********************************************************************************/
+
+function getCurrentLocale()
+{
+            
+    var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentLocale";
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", base_url, true);
+    xmlhttp.send();
+
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            current_locale = JSON.parse(xmlhttp.responseText)['result'];
+            listLocales();
+        }
+    }
+}
+
+
+function getCurrentVoice()
+{
+    var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentVoice";
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", base_url, true);
+    xmlhttp.send();
+
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            current_voice = JSON.parse(xmlhttp.responseText)['result'];
+            listVoices();
+        }
+    }
+}
+
 function initialisation() {
     getCurrentLocale();
     getCurrentVoice();
+}
+
+
+/***********************************************************************************
+ **
+ ***********************************************************************************/
+
+
+function setOutputLevel()
+{
+            
+    // var base_url = "http://" + mary_host + ":" + mary_port + "/setLoggerLevel";
+    
+    // var xmlhttp = new XMLHttpRequest();
+    // xmlhttp.open("GET", base_url, true);
+    // xmlhttp.send();
+
+    
+    // xmlhttp.onreadystatechange = function() {
+    //     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    //         current_locale = JSON.parse(xmlhttp.responseText)['result'];
+    //         listLocales();
+    //     }
+    // }
 }
