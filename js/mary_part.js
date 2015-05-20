@@ -5,7 +5,7 @@ var mary_port = "59125";
 
 var current_voice = 0;
 var current_locale = 0;
-
+var region_map = {};
 
 /***********************************************************************************
  ** Listing
@@ -13,7 +13,6 @@ var current_locale = 0;
 
 function listLocales()
 {
-        
     var base_url = "http://" + mary_host + ":" + mary_port + "/listLocales";
     
     // Build post request
@@ -23,36 +22,70 @@ function listLocales()
     
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            var current_language = current_locale.split("_")[0];
             
             var result = JSON.parse(xmlhttp.responseText)['result'];
             
             var locales = document.getElementById('locales_area');
-            // radioFragment.innerHTML = "";
+            var select_language = document.createElement("select");
+            select_language.name = "languages";
+            select_language.id = "languages";
+            select_language.size = 5;
+            locales.appendChild(select_language);
+            locales.appendChild(document.createElement("br"));
+            
             var len=result.length;
-            for(var i=0; i<len; i++) {
+            var prev_language = "";
+            for(var i=0; i<len; i++)
+            {
 
 	            var value = result[i];
-                var radio_item = document.createElement("input");
-		        radio_item.type = "radio";
-		        radio_item.name = "locale";
-		        radio_item.id = value;
-		        radio_item.value = value;
-
-                if (value == current_locale) {
-		            // radioItem1.defaultChecked = true; 
-		            radio_item.checked = true;
+                var elts = value.split("_");
+                var language = elts[0];
+                var region = elts[0];
+                if (elts.length > 1)
+                {
+                    region = elts[1];
                 }
 
-		        var text_node = document.createTextNode(value);
+                if (language != prev_language)
+                {
+                    var opt = document.createElement('option');
+                    opt.value = language;
+                    opt.innerHTML = language;
+                    if (language == current_language)
+                    {
+                        opt.selected = true;
+                    }
+                    
+                    document.getElementById('languages').appendChild(opt);
+                    prev_language = language;
+                }
                 
-                
-		        var label = document.createElement("label");
-		        label.appendChild(radio_item);
-		        label.appendChild(text_node);
-                
-                locales.appendChild(label);
+                if (language == current_language)
+                {
+                    var radio_item = document.createElement("input");
+		            radio_item.type = "radio";
+		            radio_item.name = "region";
+		            radio_item.id = value;
+		            radio_item.value = value;
+                    
+                    if (value == current_locale)
+                    {
+		                radio_item.checked = true;
+                    }
+
+		            var text_node = document.createTextNode(region);
+                    
+                    
+		            var label = document.createElement("label");
+		            label.appendChild(radio_item);
+		            label.appendChild(text_node);
+                    
+                    locales.appendChild(label);
+                }
             }
-    
         }
     }
 }

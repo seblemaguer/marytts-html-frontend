@@ -32,10 +32,10 @@ textarea[name="text_to_synth"] {
     height : 230px;  /* FIXME : going to percentage */
 }
 
-select[name="voices"] {
+select { /* [name="voices"] */
     width : 100%;
     /* border-radius: 10px; */
-    height : 190px;
+    height : 90px;
 }
 
 #text_area {
