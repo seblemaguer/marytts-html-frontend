@@ -90,8 +90,8 @@ function listLocales()
     }
 }
 
-function listVoices() {
-    
+function listVoices()
+{
     var base_url = "http://" + mary_host + ":" + mary_port + "/listVoices";
     
     // Build post request
@@ -125,10 +125,8 @@ function listVoices() {
 /***********************************************************************************
  ** Initialisation
  ***********************************************************************************/
-
 function getCurrentLocale()
 {
-            
     var base_url = "http://" + mary_host + ":" + mary_port + "/getCurrentLocale";
     
     var xmlhttp = new XMLHttpRequest();
@@ -162,16 +160,35 @@ function getCurrentVoice()
     }
 }
 
-function initialisation() {
+function initialisation()
+{
     getCurrentLocale();
     getCurrentVoice();
 }
 
 
 /***********************************************************************************
- **
+ ** Setters
  ***********************************************************************************/
+function selectVoice()
+{
+    var base_url = "http://" + mary_host + ":" + mary_port + "/setVoice";
 
+    var voice = document.getElementById('voices').value;
+    
+    
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", base_url + "?voice=" + voice, true);
+    xmlhttp.send();
+
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            current_locale = JSON.parse(xmlhttp.responseText)['result'];
+            listLocales();
+        }
+    }
+}
 
 function setOutputLevel()
 {
