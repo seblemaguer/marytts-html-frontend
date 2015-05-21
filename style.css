@@ -35,7 +35,12 @@ textarea[name="text_to_synth"] {
 select { /* [name="voices"] */
     width : 100%;
     /* border-radius: 10px; */
-    height : 90px;
+    height : 95px;
+}
+
+#regions {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 #text_area {
