@@ -300,17 +300,12 @@ function play (){
     wavesurfer.play();
 }
 
-
-function synth () {
+function synthesize() {
+    
     var base_url = "http://" + mary_host + ":" + mary_port + "/synthesize";
 
     //
     var input_text  = document.getElementsByName("text_to_synth")[0].value;
-    var input_type  = "TEXT";
-    var output_type = "AUDIO";
-    var locale = "en_US";
-    var audio = "WAVE_FILE";
-
     if (input_text.length == 0)
     {
         alert('text needs to be defined !');
@@ -321,9 +316,6 @@ function synth () {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("GET", base_url + "?text='" + input_text + "'", true);
     xmlhttp.send();
-
-
-
     
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -347,7 +339,6 @@ function synth () {
             xmlhttp_signal.responseType = 'blob';
             xmlhttp_signal.send();
 
-            
             xmlhttp_signal.onload = function() {
                 if (xmlhttp_signal.status == 200) {
                     
@@ -356,12 +347,60 @@ function synth () {
                     //     document.getElementsByName('debug')[0].value = xmlhttp_signal.responseText;
                     // }
                     wavesurfer.loadBlob(xmlhttp_signal.response);
+                    // document.getElementsByName("save")[0].disabled = false; FIXME: not working yet
+                    document.getElementsByName("play")[0].disabled = false;
                 }
             }
         }
     }
-
 }
+
+function synth () {
+    var base_url = "http://" + mary_host + ":" + mary_port + "/process";
+
+    //
+    var input_text  = document.getElementsByName("text_to_synth")[0].value;
+    var input_type  = "TEXT";
+    var output_type = "ACOUSTPARAMS";
+    var locale = "en_US"; // FIXME: harcoded locale !
+    var audio = "WAVE_FILE";
+
+    if (input_text.length == 0)
+    {
+        alert('text needs to be defined !');
+        throw new Error('text needs to be defined !');
+    }
+    
+    // Build post request
+    var xmlhttp = new XMLHttpRequest();
+    var url = base_url + "?input='" + input_text;
+    url += "'&inputType=" + input_type;
+    url += "&outputType=" + output_type+ "";
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+    
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            var result = JSON.parse(xmlhttp.responseText);
+            alert(result);
+            
+            // Change the output level
+            if (! document.getElementById('none').checked)
+            {
+                document.getElementById('debug_area').style.display = 'inline';
+                // document.getElementsByName('debug')[0].value = result['result'];
+            }
+            else
+            {
+                document.getElementById('debug_area').style.display = 'none';
+            }
+
+            synthesize();
+        }
+    }
+}
+
 /********************************************************************************************
  *** Global initialisation functions
  ********************************************************************************************/
@@ -404,8 +443,8 @@ function initialisation_demo()
     // Play at once when ready
     // Won't work on iOS until you touch the page
     wavesurfer.on('ready', function () {
-        var timeline = Object.create(WaveSurfer.Timeline);
-        timeline.init({
+        var segmentation = Object.create(WaveSurfer.Segmentation);
+        segmentation.init({
             wavesurfer: wavesurfer,
             container: "#timeline"
         });
