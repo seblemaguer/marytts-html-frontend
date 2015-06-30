@@ -3,7 +3,7 @@
     <div id="text_area">
         <fieldset>
             <legend>Text to synthesize</legend>
-            <textarea name="text_to_synth"></textarea>
+            <textarea name="text_to_synth" tabindex=1></textarea>
         </fieldset>
     </div>
     <div id="voice_choices">
@@ -20,7 +20,7 @@
 </div>
 
 <div id="validation_part">
-    <button name="synth" onclick="synth();">Synthesize</button> 
+    <button name="synth" onclick="synth();" tabindex=2>Synthesize</button> 
     <fieldset name="output_level">
         <legend>Output level</legend>
         <input type = "radio"
@@ -53,8 +53,9 @@
         <div id="waveform">
             <div class="progress progress-striped active" id="progress-bar">
                 <div class="progress-bar progress-bar-info"></div>
-            </div>
-            
+            </div>            
+        </div>
+        <div id="timeline">
         </div>
         <div id="controls">
             <button name="play" style="disabled:true" onclick="play();">Replay</button>

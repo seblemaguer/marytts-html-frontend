@@ -404,6 +404,11 @@ function initialisation_demo()
     // Play at once when ready
     // Won't work on iOS until you touch the page
     wavesurfer.on('ready', function () {
+        var timeline = Object.create(WaveSurfer.Timeline);
+        timeline.init({
+            wavesurfer: wavesurfer,
+            container: "#timeline"
+        });
         wavesurfer.play();
     });
     
