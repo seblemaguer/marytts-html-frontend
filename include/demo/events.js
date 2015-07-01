@@ -396,7 +396,6 @@ function synth () {
                     }
                 }
             }
-            alert(list_phones);
             
             // Change the output level
             if (!document.getElementById('none').checked)
@@ -445,22 +444,42 @@ function initialisation_demo()
     
     // Init
     wavesurfer.init(options);
-    
+
+    // Regions
+    wavesurfer.enableDragSelection({
+        color: randomColor(0.1)
+    });
+    /*
     // Regions
     if (wavesurfer.enableDragSelection) {
         wavesurfer.enableDragSelection({
             color: 'rgba(0, 255, 0, 0.1)'
         });
     }
+    */
     
     // Play at once when ready
     // Won't work on iOS until you touch the page
     wavesurfer.on('ready', function () {
+        // Add segmentation labels
         var segmentation = Object.create(WaveSurfer.Segmentation);
         segmentation.init({
             wavesurfer: wavesurfer,
             container: "#timeline"
         });
+
+        // Add segmentation region
+        var start = 0;
+        for (var p in list_phones) {
+            var region = new Object();
+            region.start = start;
+            region.end = start + (list_phones[p].duration / 1000);
+            region.color = randomColor(0.1);
+            wavesurfer.addRegion(region);
+            start += (list_phones[p].duration / 1000);
+        }
+        
+        // Finally play
         wavesurfer.play();
     });
     
@@ -494,4 +513,18 @@ function initialisation_demo()
         wavesurfer.on('destroy', hideProgress);
         wavesurfer.on('error', hideProgress);
     });
+}
+
+
+
+/**
+ * Random RGBA color.
+ */
+function randomColor(alpha) {
+    return 'rgba(' + [
+        ~~(Math.random() * 255),
+        ~~(Math.random() * 255),
+        ~~(Math.random() * 255),
+        alpha || 1
+    ] + ')';
 }
