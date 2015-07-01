@@ -10,6 +10,7 @@ var current_region = 0;
 
 // Create an instance
 var wavesurfer;
+var list_phones;
 
 /***********************************************************************************
  ** Listing
@@ -26,8 +27,6 @@ function listLanguages()
     
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-            
             var result = JSON.parse(xmlhttp.responseText)['result'];
             
             var languages = document.getElementById('languages');
@@ -71,11 +70,10 @@ function listRegions()
             
             var regions = document.getElementById('regions');
             regions.innerHTML = ""; // Clean first
-            
+             
             var len=result.length;
             for(var i=0; i<len; i++)
             {
-
 	            var value = result[i];
 
                 var radio_item = document.createElement("input");
@@ -319,7 +317,7 @@ function synthesize() {
     
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
+            
             var result = JSON.parse(xmlhttp.responseText);
             
             // Change the output level
@@ -340,8 +338,7 @@ function synthesize() {
             xmlhttp_signal.send();
 
             xmlhttp_signal.onload = function() {
-                if (xmlhttp_signal.status == 200) {
-                    
+                if (xmlhttp_signal.status == 200) {                
                     // if (! document.getElementById('none').checked)
                     // {
                     //     document.getElementsByName('debug')[0].value = xmlhttp_signal.responseText;
@@ -379,14 +376,30 @@ function synth () {
     xmlhttp.open("GET", url, true);
     xmlhttp.send();
     
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-            var result = JSON.parse(xmlhttp.responseText);
-            alert(result);
+    xmlhttp.onreadystatechange = function()
+    {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+        {
+            var result = JSON.parse(xmlhttp.responseText)['result'];
+            var res = "==>";
+            list_phones = [];
+            for (var p in result.phrases)
+            {
+                for (var t in result.phrases[p].tokens)
+                {
+                    for (var s in result.phrases[p].tokens[t].syllables)
+                    {
+                        for (var ph in result.phrases[p].tokens[t].syllables[s].phones)
+                        {
+                            list_phones.push(result.phrases[p].tokens[t].syllables[s].phones[ph]);
+                        }
+                    }
+                }
+            }
+            alert(list_phones);
             
             // Change the output level
-            if (! document.getElementById('none').checked)
+            if (!document.getElementById('none').checked)
             {
                 document.getElementById('debug_area').style.display = 'inline';
                 // document.getElementsByName('debug')[0].value = result['result'];
@@ -396,6 +409,7 @@ function synth () {
                 document.getElementById('debug_area').style.display = 'none';
             }
 
+            // Achieve the synthesis
             synthesize();
         }
     }
@@ -411,7 +425,6 @@ function initialisation_demo()
     
     // Create an instance
     wavesurfer = Object.create(WaveSurfer);
-    
     
     // Init & load audio file
     var options = {
