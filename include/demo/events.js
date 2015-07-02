@@ -401,7 +401,6 @@ function synth () {
                     var pause = new Object();
                     pause.label = "_"; // FIXME: hack the pause label
                     pause.duration = result.phrases[p].endPauseDuration;
-                    alert(pause.duration);
                     list_phones.push(pause);
                 }
             }
@@ -453,19 +452,8 @@ function initialisation_demo()
     
     // Init
     wavesurfer.init(options);
+    wavesurfer.initRegions();
 
-    // Regions
-    wavesurfer.enableDragSelection({
-        color: randomColor(0.1)
-    });
-    /*
-    // Regions
-    if (wavesurfer.enableDragSelection) {
-        wavesurfer.enableDragSelection({
-            color: 'rgba(0, 255, 0, 0.1)'
-        });
-    }
-    */
     
     // Play at once when ready
     // Won't work on iOS until you touch the page
@@ -483,6 +471,7 @@ function initialisation_demo()
         for (var p in list_phones) {
             var region = new Object();
             region.start = start;
+            region.drag = false;
             region.end = start + (list_phones[p].duration / 1000);
             region.color = randomColor(0.1);
             wavesurfer.addRegion(region);
