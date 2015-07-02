@@ -358,7 +358,7 @@ function synth () {
     //
     var input_text  = document.getElementsByName("text_to_synth")[0].value;
     var input_type  = "TEXT";
-    var output_type = "ACOUSTPARAMS";
+    var output_type = "REALISED_ACOUSTPARAMS";
     var locale = "en_US"; // FIXME: harcoded locale !
     var audio = "WAVE_FILE";
 
@@ -394,6 +394,15 @@ function synth () {
                             list_phones.push(result.phrases[p].tokens[t].syllables[s].phones[ph]);
                         }
                     }
+                }
+
+                if (result.phrases[p].end_pause_duration != 0)
+                {
+                    var pause = new Object();
+                    pause.label = "_"; // FIXME: hack the pause label
+                    pause.duration = result.phrases[p].endPauseDuration;
+                    alert(pause.duration);
+                    list_phones.push(pause);
                 }
             }
             
@@ -470,6 +479,7 @@ function initialisation_demo()
 
         // Add segmentation region
         var start = 0;
+        wavesurfer.clearRegions();
         for (var p in list_phones) {
             var region = new Object();
             region.start = start;
