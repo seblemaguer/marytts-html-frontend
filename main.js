@@ -30,8 +30,10 @@ function switchTo(name)
 
 
 function initialisation() {
-    var list_modes = ["demo", "expert"];
-    
+    var list_modes = ["demo"]; // "expert"];
+ 
+    if (list_modes.length > 1)
+    {
     for (var id_mode in list_modes)
     {
         var mode = list_modes[id_mode];
@@ -50,6 +52,8 @@ function initialisation() {
 		label.appendChild(radio_item);
 		label.appendChild(text_node);
         document.getElementById("interface_switch").appendChild(label);
+
+    }
 
     }
     

@@ -10,6 +10,7 @@ var current_region = 0;
 
 // Create an instance
 var wavesurfer;
+var blob_wav;
 var list_phones;
 
 /***********************************************************************************
@@ -298,6 +299,10 @@ function play (){
     wavesurfer.play();
 }
 
+function save() {
+    saveAs(blob_wav, "synth.wav");
+}
+
 function synthesize() {
     
     var base_url = "http://" + mary_host + ":" + mary_port + "/synthesize";
@@ -343,8 +348,9 @@ function synthesize() {
                     // {
                     //     document.getElementsByName('debug')[0].value = xmlhttp_signal.responseText;
                     // }
-                    wavesurfer.loadBlob(xmlhttp_signal.response);
-                    // document.getElementsByName("save")[0].disabled = false; FIXME: not working yet
+                    blob_wav = xmlhttp_signal.response;
+                    wavesurfer.loadBlob(blob_wav);
+                    document.getElementsByName("save")[0].disabled = false; // FIXME: not working yet
                     document.getElementsByName("play")[0].disabled = false;
                 }
             }
@@ -477,6 +483,15 @@ function initialisation_demo()
             wavesurfer.addRegion(region);
             start += (list_phones[p].duration / 1000);
         }
+
+        // // Add spectrogramm
+        // var spectrogram = Object.create(WaveSurfer.Spectrogram);
+        
+        // spectrogram.init({
+        //     wavesurfer: wavesurfer,
+        //     container: "#spectrogram",
+        //     fftSamples: 1024
+        // });
         
         // Finally play
         wavesurfer.play();

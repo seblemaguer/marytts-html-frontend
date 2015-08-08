@@ -68,11 +68,20 @@ legend {
 
 #waveform {
     margin-top:0px;
-    margin-bottom:20px;
+    margin-bottom:0px;
     margin-left:auto;
     margin-right:auto;
     width:90%;
 }
+
+/* #spectrogram { */
+/*     margin-top:0px; */
+/*     margin-bottom:0px; */
+/*     margin-left:auto; */
+/*     margin-right:auto; */
+/*     width:90%; */
+/* } */
+
 
 #timeline {
     margin-top:70px;
