@@ -8,10 +8,9 @@ var current_voice = 0;
 var current_language = 0;
 var current_region = 0;
 
-// Create an instance
-var wavesurfer;
-var blob_wav;
-var list_phones;
+var wavesurfer;  // Wavesurfer instance
+var blob_wav;    // Wav buffer
+var list_phones; // Phone list for the segmentation part
 
 /***********************************************************************************
  ** Listing
@@ -343,14 +342,19 @@ function synthesize() {
             xmlhttp_signal.send();
 
             xmlhttp_signal.onload = function() {
-                if (xmlhttp_signal.status == 200) {                
+                if (xmlhttp_signal.status == 200) {
+                    // TODO: debug !
                     // if (! document.getElementById('none').checked)
                     // {
                     //     document.getElementsByName('debug')[0].value = xmlhttp_signal.responseText;
                     // }
+                    
+                    // Save wav conent to memory and play it
                     blob_wav = xmlhttp_signal.response;
                     wavesurfer.loadBlob(blob_wav);
-                    document.getElementsByName("save")[0].disabled = false; // FIXME: not working yet
+
+                    // Enable the buttons
+                    document.getElementsByName("save")[0].disabled = false;
                     document.getElementsByName("play")[0].disabled = false;
                 }
             }
