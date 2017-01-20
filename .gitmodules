@@ -1,6 +1,6 @@
 [submodule "js/wavesurfer.js"]
 	path = js/wavesurfer.js
-	url = git@github.com:seblemaguer/wavesurfer.js.git
+	url = git@github.com:attacomsian/wavesurfer.js.git
 [submodule "js/FileSaver.js"]
 	path = js/FileSaver.js
 	url = git@github.com:eligrey/FileSaver.js.git
