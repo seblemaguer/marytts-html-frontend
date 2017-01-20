@@ -1,12 +1,135 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <title>MaryTTS demonstration interface</title>
-        <meta name="author" content="Sébastien Le Maguer">
-        
-        <link rel="stylesheet" href="style.css" />
-        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="MaryTTS Team">
+
+        <title>MaryTTS Demonstration Interface</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/marytss-custom.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <!--marytts logo-->
+        <div class="jumbotron text-center">
+            <img src="img/marylogo.png" />
+            <p class="text-muted">An Open-Source, Multilingual Text-to-Speech Synthesis Platform</p>
+            <p><a href="http://mary.dfki.de/" target="_blank" class="btn btn-default btn-sm">Learn more</a></p>
+        </div>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-8" id="synth_area">
+                    <div class="form-group" id="text_area">
+                        <label for="text-to-synth" class="h4">Text to Synthesize</label>
+                        <textarea id="text-to-synth" rows="7" class="form-control" name="text_to_synth" tabindex="1"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-4" id="voice_choices">
+                    <div class="form-group" id="text_area">
+                        <label for="languages" class="h4">Voices Area</label>
+                        <select class="form-control" name="languages" id="languages" size="3" onchange="selectLanguage();"></select>
+                        <div name="regions" id="regions"></div>
+                        <br/>
+                        <select class="form-control" name="voices" id="voices" size="3" onchange="selectVoice();"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="validation_part">
+                <div class="col-sm-8">
+                    <button class="btn btn-success btn-block btn-lg" name="synth" onclick="synth();" tabindex=2>Synthesize</button> 
+                </div>
+                <div class="col-sm-4">
+                    <label class="h4">Output Level</label><br/>
+                    <input type = "radio"
+                           name = "output_level"
+                           id = "none"
+                           value = "none"
+                           checked = "checked"
+                           onChange = "setLevel('none');" />
+                    <label for = "none">None</label>
+                    &nbsp;
+                    <input type = "radio"
+                           name = "output_level"
+                           id = "info"
+                           value = "info"
+                           onChange = "setLevel('info');" />
+                    <label for = "info">Info</label>
+                    &nbsp;
+                    <input type = "radio"
+                           name = "output_level"
+                           id = "debug"
+                           value = "debug"
+                           onChange = "setLevel('debug');" />
+                    <label for = "debug">Debug</label>
+                </div>
+            </div>
+
+            <div class="clearfix"></div><br/><br/>
+
+            <div class="row" id="results_area">
+                <div class="col-sm-12" id="audio_area">
+                    <div id="timeline">
+                    </div>
+                    <div id="waveform">
+                        <div id="progress-bar">
+                            <div class="progress-bar-blob"></div>
+                        </div>            
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-1">
+                            <i class="glyphicon glyphicon-zoom-in glyphicon-2x"></i>
+                        </div>
+
+                        <div class="col-xs-10">
+                            <input id="slider" type="range" min="100" max="1200" value="1" style="width: 100%" />
+                        </div>
+
+                        <div class="col-xs-1">
+                            <i class="glyphicon glyphicon-zoom-out glyphicon-2x"></i>
+                        </div>
+                    </div>
+                    <!-- <div id="spectrogram"> -->
+                    <!-- </div> -->
+                    <div id="controls" class="text-center">
+                        <button class="btn btn-primary" id="pause" name="pause" onclick="pause();" data-state="off" disabled>
+                            <em id="pause-icon" class="glyphicon glyphicon-pause"></em> <span id="pause-text">Pause</span>
+                        </button>
+                        <button class="btn btn-primary" id="play" name="play" onclick="play();" disabled>
+                            <em class="glyphicon glyphicon-repeat"></em> Replay
+                        </button>
+                        <button class="btn btn-success" id="save" name="save" onclick="save();" disabled>
+                            <em class="glyphicon glyphicon-save"></em> Save
+                        </button> 
+                    </div>
+
+                </div>
+                <div class="col-sm-12" id="debug_area" style="display:none;">
+                    <div class="form-group" id="text_area">
+                        <label for="debug" class="h4">Server Output</label>
+                        <textarea name="debug" class="form-control" id="debug"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.container -->
+        <br/>
+        <br/>
+        <!--js resources-->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
         <!-- wavesurfer.js -->
         <script src="js/wavesurfer.js/src/wavesurfer.js"></script>
         <script src="js/wavesurfer.js/src/util.js"></script>
@@ -20,22 +143,8 @@
 
         <!-- Download part -->
         <script src="js/FileSaver.js/FileSaver.js"></script>
-        <!-- mary dedicated api -->
-        <script src="main.js"></script>
 
-        
-        <script src="jquery.min.js"></script>
-        <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
-    </head>
-    
-    <body onLoad="initialisation();">
-        <div id="header">
-            <img src="img/marylogo.png" />
-        </div>
-        <div id="interface_switch">    
-        </div>
-        
-        <!-- Content which will be dynamically defined ! -->
-        <div id="content">No available contents</div>      
+        <!-- mary js api -->
+        <script src="js/marytts-api.js"></script>
     </body>
 </html>

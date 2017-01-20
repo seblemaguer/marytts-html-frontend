@@ -1,3 +1,0 @@
-function initialisation_expert()
-{
-}
