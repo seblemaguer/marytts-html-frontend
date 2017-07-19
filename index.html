@@ -30,28 +30,25 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-sm-8" id="synth_area">
+                <div class="col-sm-6" id="synth_area">
                     <div class="form-group" id="text_area">
                         <label for="text-to-synth" class="h4">Text to Synthesize</label>
                         <textarea id="text-to-synth" rows="7" class="form-control" name="text_to_synth" tabindex="1"></textarea>
                     </div>
                 </div>
-                <div class="col-sm-4" id="voice_choices">
+                <div class="col-sm-6" id="configuration">
                     <div class="form-group" id="text_area">
-                        <label for="languages" class="h4">Voices Area</label>
-                        <select class="form-control" name="languages" id="languages" size="3" onchange="selectLanguage();"></select>
-                        <div name="regions" id="regions"></div>
-                        <br/>
-                        <select class="form-control" name="voices" id="voices" size="3" onchange="selectVoice();"></select>
+                        <label for="configuration" class="h4">User configuration of the system</label>
+                        <textarea id="configuration" rows="7" class="form-control" name="text_to_synth" tabindex="1"></textarea>
                     </div>
                 </div>
             </div>
 
             <div class="row" id="validation_part">
-                <div class="col-sm-8">
-                    <button class="btn btn-success btn-block btn-lg" name="synth" onclick="synth();" tabindex=2>Synthesize</button> 
+                <div class="col-sm-9">
+                    <button class="btn btn-success btn-block btn-lg" name="synth" onclick="synth();" tabindex=2>Synthesize</button>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <label class="h4">Output Level</label><br/>
                     <input type = "radio"
                            name = "output_level"
@@ -86,7 +83,7 @@
                     <div id="waveform">
                         <div id="progress-bar">
                             <div class="progress-bar-blob"></div>
-                        </div>            
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-1">
@@ -112,7 +109,7 @@
                         </button>
                         <button class="btn btn-success" id="save" name="save" onclick="save();" disabled>
                             <em class="glyphicon glyphicon-save"></em> Save
-                        </button> 
+                        </button>
                     </div>
 
                 </div>
