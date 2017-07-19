@@ -59,19 +59,6 @@ function save() {
 }
 
 /**
- * Set output level
- * @param {type} value - output type
- * @returns {undefined}
- */
-function setLevel(value) {
-    if (!$('#none').is(':checked')) {
-        $('#debug_area').css('display', 'inline');
-    } else {
-        $('#debug_area').css('display', 'none');
-    }
-}
-
-/**
  * Synthesize the text
  * @returns {undefined}
  */

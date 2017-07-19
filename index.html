@@ -45,32 +45,8 @@
             </div>
 
             <div class="row" id="validation_part">
-                <div class="col-sm-9">
+                <div class="col-sm-12">
                     <button class="btn btn-success btn-block btn-lg" name="synth" onclick="synth();" tabindex=2>Synthesize</button>
-                </div>
-                <div class="col-sm-3">
-                    <label class="h4">Output Level</label><br/>
-                    <input type = "radio"
-                           name = "output_level"
-                           id = "none"
-                           value = "none"
-                           checked = "checked"
-                           onChange = "setLevel('none');" />
-                    <label for = "none">None</label>
-                    &nbsp;
-                    <input type = "radio"
-                           name = "output_level"
-                           id = "info"
-                           value = "info"
-                           onChange = "setLevel('info');" />
-                    <label for = "info">Info</label>
-                    &nbsp;
-                    <input type = "radio"
-                           name = "output_level"
-                           id = "debug"
-                           value = "debug"
-                           onChange = "setLevel('debug');" />
-                    <label for = "debug">Debug</label>
                 </div>
             </div>
 
