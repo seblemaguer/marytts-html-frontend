@@ -33,26 +33,57 @@
                 <div class="col-sm-6" id="synth_area">
                     <div class="form-group" id="text_area">
                         <label for="text-to-synth" class="h4">Text to Synthesize</label>
-                        <textarea id="text-to-synth" rows="7" class="form-control" name="text_to_synth" tabindex="1"></textarea>
+                        <textarea id="text-to-synth" rows="12" class="form-control" name="text_to_synth" tabindex="1"></textarea>
                     </div>
                 </div>
                 <div class="col-sm-6" id="configuration">
                     <div class="form-group" id="text_area">
-                        <label for="configuration" class="h4">User configuration of the system</label>
-                        <textarea id="configuration" rows="7" class="form-control" name="text_to_synth" tabindex="1"></textarea>
+                        <label for="text-configuration" class="h4">User configuration of the system</label>
+                        <textarea id="text-configuration" rows="12" class="form-control" name="configuration" tabindex="1">
+# How to extract the input
+input_serializer=marytts.io.serializer.TextSerializer
+
+# How to render the output
+output_serializer=marytts.io.serializer.DefaultHTSLabelSerializer
+# output_serializer=marytts.io.serializer.XMLSerializer
+output_serializer=marytts.io.serializer.ROOTSJSONSerializer
+# output_serializer=marytts.io.serializer.AudioSerializer
+# output_serializer=marytts.io.serializer.TSVSerializer
+
+# Current locale
+locale=en_US
+
+# List of modules
+modules=marytts.language.en.JTokenizer                  \
+	marytts.language.en.Preprocess                  \
+        marytts.modules.nlp.OpenNLPPosTagger            \
+        marytts.modules.nlp.JPhonemiser                 \
+        marytts.language.en.Prosody                     \
+        marytts.modules.nlp.PronunciationModel          \
+        marytts.modules.acoustic.TargetFeatureLister    \
+	marytts.pyhts.modules.HMMSynthesizer
+
+			</textarea>
                     </div>
                 </div>
             </div>
 
             <div class="row" id="validation_part">
                 <div class="col-sm-12">
-                    <button class="btn btn-success btn-block btn-lg" name="synth" onclick="synth();" tabindex=2>Synthesize</button>
+                    <button class="btn btn-success btn-block btn-lg" name="synth" onclick="run();" tabindex=2>Run</button>
                 </div>
             </div>
 
             <div class="clearfix"></div><br/><br/>
 
-            <div class="row" id="results_area">
+            <div class="row" id="text_results_area">
+                <div class="form-group" id="text_area">
+		    <label for="text-result" class="h4">Result</label>
+                    <textarea id="text-result" rows="12" class="form-control" name="text_result" tabindex="1" wrap="soft"></textarea>
+		</div>
+	    </div>
+
+            <div class="row" id="audio_results_area">
                 <div class="col-sm-12" id="audio_area">
                     <div id="timeline">
                     </div>
