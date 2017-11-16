@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.directive('spectro', function () {
 		return {
 			templateUrl: 'views/spectro.html',

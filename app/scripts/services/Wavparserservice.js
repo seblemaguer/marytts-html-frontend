@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('testApp')
-	.service('Wavparserservice', function Wavparserservice($q) {
-		// shared service object
-		var sServObj = {};
+angular.module('MaryTTSHTMLFrontEnd')
+    .service('Wavparserservice', function Wavparserservice($q) {
+	// shared service object
+	var sServObj = {};
 
-		var defer;
+	var defer;
 
         /**
          * convert binary values to strings
@@ -24,7 +24,7 @@ angular.module('testApp')
 
         /**
          * parse header of wav file
-		 * (currently duplicate of function in wavParserWorkerClass)
+	 * (currently duplicate of function in wavParserWorkerClass)
          * @param buf array buffer containing entire wav file
          */
         sServObj.parseWavHeader = function(buf){
@@ -93,33 +93,33 @@ angular.module('testApp')
             headerInfos.Subchunk1Size = curBufferView[0];
             // console.log([16,18].indexOf(19))
             if ([16,18,40].indexOf(headerInfos.Subchunk1Size) === -1) {
-            // console.error('Wav read error: Subchunk1Size not 16');
-                 return ({
-                     'status': {
-                         'type': 'ERROR',
-                         'message': 'Wav read error: Subchunk1Size not 16, 18 or 40 but ' + headerInfos.Subchunk1Size
-                     }
-                 });
+		// console.error('Wav read error: Subchunk1Size not 16');
+                return ({
+                    'status': {
+                        'type': 'ERROR',
+                        'message': 'Wav read error: Subchunk1Size not 16, 18 or 40 but ' + headerInfos.Subchunk1Size
+                    }
+                });
             }
 
-			// check if WAVEFORMATEXTENSIBLE struct see: http://www.jensign.com/riffparse/
-			if(headerInfos.Subchunk1Size !== 40){
+	    // check if WAVEFORMATEXTENSIBLE struct see: http://www.jensign.com/riffparse/
+	    if(headerInfos.Subchunk1Size !== 40){
             	// AudioFormat == 1  CHECK
             	curBinIdx = 20;
             	curBuffer = buf.subarray(curBinIdx, 2);
             	curBufferView = new Uint16Array(curBuffer);
             	headerInfos.AudioFormat = curBufferView[0];
             	if ([0, 1].indexOf(headerInfos.AudioFormat) === -1) {
-                	// console.error('Wav read error: AudioFormat not 1');
-                	return ({
+                    // console.error('Wav read error: AudioFormat not 1');
+                    return ({
                     	'status': {
-	                        'type': 'ERROR',
+	                    'type': 'ERROR',
     	                    'message': 'Wav read error: AudioFormat not 0 or 1 but ' + headerInfos.AudioFormat
-        	            }
+        	        }
             	    });
 
             	}
-			}
+	    }
 
             // NumChannels == 1  CHECK
             curBinIdx = 22;
@@ -161,23 +161,23 @@ angular.module('testApp')
             headerInfos.BitsPerSample = curBufferView[0];
 
 
-			// look for data chunk
-			var foundChunk = false;
-			curBinIdx = 36;
-			while(!foundChunk){
-	            curBuffer = buf.subarray(curBinIdx, 4);
+	    // look for data chunk
+	    var foundChunk = false;
+	    curBinIdx = 36;
+	    while(!foundChunk){
+	        curBuffer = buf.subarray(curBinIdx, 4);
     	        curBufferView = new Uint8Array(curBuffer);
-        	    var cur4chars = sServObj.ab2str(curBufferView);
-				if(cur4chars === 'data'){
-					foundChunk = true;
-		            curBuffer = buf.subarray(curBinIdx+4, 4);
-		            curBufferView = new Uint32Array(curBuffer);
-					headerInfos.dataChunkSize = curBufferView[0];
-				}else{
-					curBinIdx += 1;
-				}
-	
-			}
+        	var cur4chars = sServObj.ab2str(curBufferView);
+		if(cur4chars === 'data'){
+		    foundChunk = true;
+		    curBuffer = buf.subarray(curBinIdx+4, 4);
+		    curBufferView = new Uint32Array(curBuffer);
+		    headerInfos.dataChunkSize = curBufferView[0];
+		}else{
+		    curBinIdx += 1;
+		}
+
+	    }
 
             return headerInfos;
 
@@ -186,11 +186,11 @@ angular.module('testApp')
 
 
         /**
-		 * parse buffer containing wav file using webworker
-		 * @param buf
-		 * @returns promise
-		 */
-		sServObj.parseWavAudioBuf = function (buf) {
+	 * parse buffer containing wav file using webworker
+	 * @param buf
+	 * @returns promise
+	 */
+	sServObj.parseWavAudioBuf = function (buf) {
             var headerInfos = sServObj.parseWavHeader(buf);
             if(typeof headerInfos.status !== 'undefined' && headerInfos.status.type === 'ERROR'){
                 defer = $q.defer();
@@ -198,9 +198,9 @@ angular.module('testApp')
                 return defer.promise;
             }else{
                 try {
-    				var offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
-	    			    headerInfos.NumChannels,
-		    			headerInfos.dataChunkSize/headerInfos.NumChannels/(headerInfos.BitsPerSample/8),
+    		    var offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(
+	    		headerInfos.NumChannels,
+		    	headerInfos.dataChunkSize/headerInfos.NumChannels/(headerInfos.BitsPerSample/8),
                     	headerInfos.SampleRate);
                     return offlineCtx.decodeAudioData(buf);
                 }catch (e){
@@ -222,8 +222,8 @@ angular.module('testApp')
             }
 
 
-		};
+	};
 
-		return sServObj;
+	return sServObj;
 
-	});
+    });

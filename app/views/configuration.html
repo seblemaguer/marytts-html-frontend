@@ -1,0 +1,29 @@
+
+<div class="form-group" id="text_area">
+    <label for="text-configuration" class="h4">User configuration of the system</label>
+    <textarea id="text-configuration" rows="12" class="form-control" name="configuration" tabindex="1">
+# How to extract the input
+input_serializer=marytts.io.serializer.TextSerializer
+
+# How to render the output
+output_serializer=marytts.io.serializer.DefaultHTSLabelSerializer
+# output_serializer=marytts.io.serializer.XMLSerializer
+output_serializer=marytts.io.serializer.ROOTSJSONSerializer
+# output_serializer=marytts.io.serializer.AudioSerializer
+# output_serializer=marytts.io.serializer.TSVSerializer
+
+# Current locale
+locale=en_US
+
+# List of modules
+modules=marytts.language.en.JTokenizer                  \
+	marytts.language.en.Preprocess                  \
+        marytts.modules.nlp.OpenNLPPosTagger            \
+        marytts.modules.nlp.JPhonemiser                 \
+        marytts.language.en.Prosody                     \
+        marytts.modules.nlp.PronunciationModel          \
+        marytts.modules.acoustic.TargetFeatureLister    \
+	marytts.pyhts.modules.HMMSynthesizer
+
+    </textarea>
+</div>

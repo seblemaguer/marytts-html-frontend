@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc service
- * @name emuwebApp.mathHelperService
+ * @name MaryTTSHTMLFrontEnd.mathHelperService
  * @description
  * # mathHelperService
  * Service in the emuwebApp.
  */
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.service('mathHelperService', function () {
 
 		//shared service object to be returned

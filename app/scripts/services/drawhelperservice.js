@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.service('Drawhelperservice', function Drawhelperservice(fileService, mathHelperService) {
 
 		//shared service object to be returned
@@ -21,7 +21,7 @@ angular.module('testApp')
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		sServObj.calculateOsciPeaks = function () {
 			var sampleRate = fileService.audioBuffer.sampleRate;
@@ -52,7 +52,7 @@ angular.module('testApp')
 			for(var channelIdx = 0; channelIdx < numberOfChannels; channelIdx++){
 
 				var curChannelSamples = fileService.audioBuffer.getChannelData(channelIdx);
-			
+
 				// preallocate min max peaks arrays
 				var curChannelMaxPeaksWinSize0 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize0));
 				var curChannelMinPeaksWinSize0 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize0));
@@ -62,7 +62,7 @@ angular.module('testApp')
 
 				var curChannelMaxPeaksWinSize2 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize2));
 				var curChannelMinPeaksWinSize2 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize2));
-				
+
 				var curWindowIdxCounterWinSize0 = 0;
 				var curPeakIdxWinSize0 = 0;
 				var winMinPeakWinSize0 = Infinity;
@@ -171,7 +171,7 @@ angular.module('testApp')
 		 */
 
 		sServObj.calculatePeaks = function (canvas, data, sS, eS) {
-			
+
 			var samplePerPx = (eS + 1 - sS) / canvas.width; // samples per pixel + one to correct for subtraction
 			// var numberOfChannels = 1; // hardcode for now...
 			// init result values for over sample exact
@@ -247,7 +247,7 @@ angular.module('testApp')
 					}
 				}
 			} //else
-			
+
 			return {
 				'samples': samples,
 				'minSample': minSamples,
@@ -332,11 +332,11 @@ angular.module('testApp')
 			}
 
 			// samples per pixel + one to correct for subtraction
-			var samplesPerPx = (eS + 1 - sS) / canvas.width; 
+			var samplesPerPx = (eS + 1 - sS) / canvas.width;
 
 			var i;
 
-			// find current peaks array window size by checking if 
+			// find current peaks array window size by checking if
 			var winIdx = -1;
 			for (i = 0; i < sServObj.osciPeaks.winSizes.length; i++) {
 				if(samplesPerPx > sServObj.osciPeaks.winSizes[i]){
@@ -361,7 +361,7 @@ angular.module('testApp')
 				var startPeakWinIdx = ssT * pps;
 
 				//ctx.strokeStyle = ConfigProviderService.design.color.black;
-				
+
 				var peakIdx = Math.round(startPeakWinIdx);
 				ctx.beginPath();
 				yMax = ((allPeakVals.maxMaxPeak - sServObj.osciPeaks.channelOsciPeaks[0].maxPeaks[winIdx][peakIdx]) / (allPeakVals.maxMaxPeak - allPeakVals.minMinPeak)) * canvas.height;
@@ -406,7 +406,7 @@ angular.module('testApp')
 				if (allPeakVals.minPeaks && allPeakVals.maxPeaks && allPeakVals.samplePerPx >= 1) {
 					// draw envelope
 					ctx.strokeStyle = "#000000";
-					
+
 					ctx.beginPath();
 					yMax = ((allPeakVals.maxMaxPeak - allPeakVals.maxPeaks[0]) / (allPeakVals.maxMaxPeak - allPeakVals.minMinPeak)) * canvas.height;
 					yMin = ((allPeakVals.maxMaxPeak - allPeakVals.minPeaks[0]) / (allPeakVals.maxMaxPeak - allPeakVals.minMinPeak)) * canvas.height;

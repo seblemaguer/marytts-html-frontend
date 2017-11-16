@@ -1,40 +1,10 @@
 
 <div class="row">
     <div class="col-sm-6" id="synth_area">
-        <div class="form-group" id="text_area">
-            <label for="text-to-synth" class="h4">Text to Synthesize</label>
-            <textarea id="text-to-synth" rows="12" class="form-control" name="text_to_synth" tabindex="1"></textarea>
-        </div>
+	<inputtext></inputtext>
     </div>
     <div class="col-sm-6" id="configuration">
-        <div class="form-group" id="text_area">
-            <label for="text-configuration" class="h4">User configuration of the system</label>
-            <textarea id="text-configuration" rows="12" class="form-control" name="configuration" tabindex="1">
-# How to extract the input
-input_serializer=marytts.io.serializer.TextSerializer
-
-# How to render the output
-output_serializer=marytts.io.serializer.DefaultHTSLabelSerializer
-# output_serializer=marytts.io.serializer.XMLSerializer
-output_serializer=marytts.io.serializer.ROOTSJSONSerializer
-# output_serializer=marytts.io.serializer.AudioSerializer
-# output_serializer=marytts.io.serializer.TSVSerializer
-
-# Current locale
-locale=en_US
-
-# List of modules
-modules=marytts.language.en.JTokenizer                  \
-	marytts.language.en.Preprocess                  \
-        marytts.modules.nlp.OpenNLPPosTagger            \
-        marytts.modules.nlp.JPhonemiser                 \
-        marytts.language.en.Prosody                     \
-        marytts.modules.nlp.PronunciationModel          \
-        marytts.modules.acoustic.TargetFeatureLister    \
-	marytts.pyhts.modules.HMMSynthesizer
-
-	    </textarea>
-        </div>
+	<configuration></configuration>
     </div>
 </div>
 
@@ -46,28 +16,12 @@ modules=marytts.language.en.JTokenizer                  \
 
 <div class="clearfix"></div><br/><br/>
 
-<div class="row" id="text_results_area">
-    <div class="form-group" id="text_area">
-	<label for="text-result" class="h4">Result</label>
-        <textarea id="text-result" rows="12" class="form-control" name="text_result" tabindex="1" wrap="soft"></textarea>
-    </div>
-</div>
+<textresults></textresults>
 
 <div class="row" id="audio_results_area">
-    <div class="col-sm-12" id="audio_area">
-        <div id="controls" class="text-center">
-            <button class="btn btn-primary" id="pause" name="pause" onclick="pause();" data-state="off" disabled>
-                <em id="pause-icon" class="glyphicon glyphicon-pause"></em> <span id="pause-text">Pause</span>
-            </button>
-            <button class="btn btn-primary" id="play" name="play" onclick="play();" disabled>
-                <em class="glyphicon glyphicon-repeat"></em> Replay
-            </button>
-            <button class="btn btn-success" id="save" name="save" onclick="save();" disabled>
-                <em class="glyphicon glyphicon-save"></em> Save
-            </button>
-        </div>
-
-    </div>
+    <!-- <osci></osci>
+	 <spectro></spectro> -->
+    <audiocontrols></audiocontrols>
 
     <div class="col-sm-12" id="debug_area" style="display:none;">
         <div class="form-group" id="text_area">

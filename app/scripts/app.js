@@ -2,14 +2,14 @@
 
 /**
  * @ngdoc overview
- * @name testApp
+ * @name MaryTTSHTMLFrontEnd
  * @description
  * # testApp
  *
  * Main module of the application.
  */
 angular
-  .module('testApp', [
+  .module('MaryTTSHTMLFrontEnd', [
     'ngAnimate',
     'ngCookies',
     'ngResource',
@@ -23,11 +23,6 @@ angular
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
         controllerAs: 'main'
-      })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'about'
       })
       .otherwise({
         redirectTo: '/'

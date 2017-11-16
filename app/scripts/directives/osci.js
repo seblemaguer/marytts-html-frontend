@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.directive('osci', function (Drawhelperservice, fileService) {
 		return {
 			templateUrl: 'views/osci.html',
@@ -13,7 +13,7 @@ angular.module('testApp')
 				scope.fs = fileService;
 				//get the canvas and draw the buffer when available
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
-					console.log("Valeur "+newValue);
+					console.log("Valeur " + newValue);
 					if(newValue!==oldValue) {
 						console.log("Je suis dans le watch");
 						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, 0, fileService.audioBuffer.length, true);

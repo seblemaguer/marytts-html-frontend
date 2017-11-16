@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.factory('browserDetector', function () {
 
 		//shared service object to be returned

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('testApp')
+angular.module('MaryTTSHTMLFrontEnd')
 	.service('fileService', function fileService($rootScope,Wavparserservice,browserDetector) {
 		// shared service object
 		var sServObj = {};
@@ -40,7 +40,7 @@ angular.module('testApp')
 						console.log("Audio Buffer : "+audioBuffer);
 						sServObj.setAudioBuffer(audioBuffer);
 					}, function (errMess){
-						console.log("Erreur " + errMess);						
+						console.log("Erreur " + errMess);
 					});
 				}
 			};
