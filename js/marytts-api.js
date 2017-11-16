@@ -143,35 +143,58 @@ function run() {
             "configuration": configuration
 	},
 	       function(result) {
+
+		   // if ("exception" in result) {
+		   //     $("#text-result").val(JSON.stringify(result["exception"]));
+		   //     return;
+		   // }
+
 		   var result_content = result["result"];
 		   $("#text-result").val(result_content);
 
 		   var json_result = JSON.parse(result_content);
 
-		   var audio_b64;
+		   if (json_result == null) {
+		       return;
+		   }
 		   if ("audio" in json_result) {
 		       $("#text-result").val(json_result["audio"]);
-		       audio_b64 = json_result["audio"];
+
+		       // Only audio
+		       blob_wav = b64toBlob(json_result["audio"], "audio/x-wav");
+		       wavesurfer.loadBlob(blob_wav);
+		       $('#pause').prop('disabled', false);
+		       $('#play').prop('disabled', false);
+		       $('#save').prop('disabled', false);
+		       //reset pause button state
+		       $('#pause').attr('data-state', 'off');
+		       $('#pause-text').text('Pause');
+		       $('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+
 		   } else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
-		       audio_b64 = json_result["sequences"]["AUDIO"][0]["ais"];
+
+		       // Extract the wave
+		       blob_wav = b64toBlob(json_result["sequences"]["AUDIO"][0]["ais"], "audio/x-wav");
+		       wavesurfer.loadBlob(blob_wav);
+
+		       // enable buttons
+		       $('#pause').prop('disabled', false);
+		       $('#play').prop('disabled', false);
+		       $('#save').prop('disabled', false);
+
+		       //reset pause button state
+		       $('#pause').attr('data-state', 'off');
+		       $('#pause-text').text('Pause');
+		       $('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+
+		       //scroll down to bottom
+		       $("html, body").animate({scrollTop: $(document).height()}, 1000);
+		   } else {
+		       $("#audio_results_area").prop("display", "none");
 		   }
 
 
-		   blob_wav = b64toBlob(audio_b64, "audio/x-wav");
-		   wavesurfer.loadBlob(blob_wav);
 
-		   // Enable the buttons
-		   $('#pause').prop('disabled', false);
-		   $('#play').prop('disabled', false);
-		   $('#save').prop('disabled', false);
-		   //reset pause button state
-		   $('#pause').attr('data-state', 'off');
-		   $('#pause-text').text('Pause');
-		   $('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
-		   //scroll down to bottom
-		   $("html, body").animate({
-		       scrollTop: $(document).height()
-		   }, 1000);
 
 		   /*
 		     list_phones = [];
