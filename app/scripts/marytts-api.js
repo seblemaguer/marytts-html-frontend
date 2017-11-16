@@ -29,7 +29,7 @@ function _baseUrl() {
  * @returns {undefined}
  */
 function play() {
-    wavesurfer.play();
+
 }
 
 /**
@@ -55,7 +55,7 @@ function pause() {
  * @returns {undefined}
  */
 function save() {
-    saveAs(blob_wav, "synth.wav");
+    // saveAs(blob_wav, "synth.wav");
 }
 
 
@@ -162,10 +162,11 @@ function run() {
 
 		       // Only audio
 		       blob_wav = b64toBlob(json_result["audio"], "audio/x-wav");
-		       wavesurfer.loadBlob(blob_wav);
+		       // wavesurfer.loadBlob(blob_wav);
 		       $('#pause').prop('disabled', false);
 		       $('#play').prop('disabled', false);
 		       $('#save').prop('disabled', false);
+
 		       //reset pause button state
 		       $('#pause').attr('data-state', 'off');
 		       $('#pause-text').text('Pause');
@@ -175,7 +176,7 @@ function run() {
 
 		       // Extract the wave
 		       blob_wav = b64toBlob(json_result["sequences"]["AUDIO"][0]["ais"], "audio/x-wav");
-		       wavesurfer.loadBlob(blob_wav);
+		       // wavesurfer.loadBlob(blob_wav);
 
 		       // enable buttons
 		       $('#pause').prop('disabled', false);
@@ -228,110 +229,7 @@ function run() {
 /********************************************************************************************
  *** Global initialisation functions
  ********************************************************************************************/
-$(document).ready(function() {
-
-    // Create an instance
-    wavesurfer = Object.create(WaveSurfer);
-
-    // Init & load audio file
-    var options = {
-	container: document.querySelector('#waveform'),
-	// FIXME: see for the scrollbar
-	// fillParent    : false,
-	// minPxPerSec   : 2000,
-	waveColor: '#587d9d',
-	progressColor: '#97c7de',
-	height: 200,
-	cursorColor: 'red'
-    };
-
-    if (location.search.match('scroll')) {
-	options.minPxPerSec = 100;
-	options.scrollParent = true;
-    }
-
-    // Init
-    wavesurfer.init(options);
-    wavesurfer.initRegions();
-
-    //add zoom in/out slider
-    var slider = document.querySelector('#slider');
-
-    slider.oninput = function() {
-	var zoomLevel = Number(slider.value);
-	wavesurfer.zoom(zoomLevel);
-    };
-
-    // Play at once when ready
-    // Won't work on iOS until you touch the page
-    wavesurfer.on('ready', function() {
-	//reset the zoom slider
-	$('#slider').val(100);
-	wavesurfer.zoom(100);
-	// Add segmentation labels
-	var segmentation = Object.create(WaveSurfer.Segmentation);
-	segmentation.init({
-	    wavesurfer: wavesurfer,
-	    container: "#timeline"
-	});
-
-	// Add segmentation region
-	var start = 0;
-	wavesurfer.clearRegions();
-	for (var p in list_phones) {
-	    var region = new Object();
-	    region.start = start;
-	    region.drag = false;
-	    region.end = start + (list_phones[p].duration / 1000);
-	    region.color = randomColor(0.1);
-	    wavesurfer.addRegion(region);
-	    start += (list_phones[p].duration / 1000);
-	}
-
-	// // Add spectrogramm
-	// var spectrogram = Object.create(WaveSurfer.Spectrogram);
-
-	// spectrogram.init({
-	//     wavesurfer: wavesurfer,
-	//     container: "#spectrogram",
-	//     fftSamples: 1024
-	// });
-
-	// Finally play
-	wavesurfer.play();
-    });
-
-    // Report errors
-    wavesurfer.on('error', function(err) {
-	console.error(err);
-    });
-
-    // Do something when the clip is over
-    wavesurfer.on('finish', function() {
-	console.log('Finished playing');
-    });
-
-
-    /* Progress bar */
-    document.addEventListener('DOMContentLoaded', function() {
-	var progressDiv = document.querySelector('#progress-bar');
-	var progressBar = progressDiv.querySelector('.progress-bar-blob');
-
-	var showProgress = function(percent) {
-	    progressDiv.style.display = 'block';
-	    progressBar.style.width = percent + '%';
-	};
-
-	var hideProgress = function() {
-	    progressDiv.style.display = 'none';
-	};
-
-	wavesurfer.on('loading', showProgress);
-	wavesurfer.on('ready', hideProgress);
-	wavesurfer.on('destroy', hideProgress);
-	wavesurfer.on('error', hideProgress);
-    });
-});
+$(document).ready(function() { });
 
 /**
  * Random RGBA color.

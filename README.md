@@ -11,10 +11,8 @@ You need to have the following packages already installed:
 ### Install dependencies
 Run the following command in a terminal
 
-1. `npm install grunt`
+1. `npm install`
 2. `bower install`
-3. `npm install`
-
 
 ### Starting the server
 
