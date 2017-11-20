@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.directive('inputtext', function (Drawhelperservice, fileService) {
+	.directive('inputtext', function (Drawhelperservice, MaryService) {
 		return {
 			templateUrl: 'views/inputtext.html',
 			restrict: 'E',

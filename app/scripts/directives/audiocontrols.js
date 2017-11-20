@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.directive('audiocontrols', function (Drawhelperservice, fileService) {
+	.directive('audiocontrols', function (Drawhelperservice, MaryService) {
 		return {
 			templateUrl: 'views/audiocontrols.html',
 			restrict: 'E',

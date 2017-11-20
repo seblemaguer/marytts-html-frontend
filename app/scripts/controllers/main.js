@@ -8,9 +8,9 @@
  * Controller of the testApp
  */
 angular.module('MaryTTSHTMLFrontEnd')
-  .controller('MainCtrl', function ($scope,$rootScope, fileService) {
+  .controller('MainCtrl', function ($scope,$rootScope, MaryService) {
 
-  		$scope.fs = fileService;
+  		$scope.fs = MaryService;
 
   		// $scope.$watch("fs.audioBuffer", function(newVal){
   		// 	console.log("Valeur " + newVal);

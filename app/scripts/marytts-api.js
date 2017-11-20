@@ -1,36 +1,3 @@
-'use strict';
-
-/* Mary global information */
-var MARY_HOST = "localhost";
-var MARY_PORT = "59125";
-
-var current_voice = 0;
-var current_language = 0;
-var current_region = 0;
-
-var wavesurfer; // Wavesurfer instance
-var blob_wav; // Wav buffer
-var list_phones; // Phone list for the segmentation part
-
-/**
- * Get base Mary HTTP server url
- * @returns {String} base server URL
- */
-function _baseUrl() {
-    return "http://" + MARY_HOST + ":" + MARY_PORT + "/";
-}
-
-
-/*************************************************************************************************
- ** Marytts
- *************************************************************************************************/
-/**
- * Play the audio file
- * @returns {undefined}
- */
-function play() {
-
-}
 
 /**
  * Pause the audio file
@@ -48,14 +15,6 @@ function pause() {
 	$('#pause-text').text('Pause');
 	$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
     }
-}
-
-/**
- * Save the audio file
- * @returns {undefined}
- */
-function save() {
-    // saveAs(blob_wav, "synth.wav");
 }
 
 
@@ -89,38 +48,6 @@ var Base64 = {
 	// t = Base64._utf8_decode(t);
 	return t;
     }
-}
-
-
-
-function b64toBlob(b64Data, contentType, sliceSize) {
-    contentType = contentType || '';
-    sliceSize = sliceSize || 512;
-
-
-    // First atob !
-    var byteCharacters = Base64.decode(b64Data); // #31: ExtendScript bad parse of /=
-
-    var byteArrays = [];
-
-    for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    	var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-    	var byteNumbers = new Array(slice.length);
-    	for (var i = 0; i < slice.length; i++) {
-    	    byteNumbers[i] = slice.charCodeAt(i);
-    	}
-
-    	var byteArray = new Uint8Array(byteNumbers);
-
-    	byteArrays.push(byteArray);
-    }
-
-    var blob = new window.Blob(byteArrays, {
-    	type: contentType
-    });
-
-    return blob;
 }
 
 /**
@@ -175,8 +102,15 @@ function run() {
 		   } else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
 
 		       // Extract the wave
-		       blob_wav = b64toBlob(json_result["sequences"]["AUDIO"][0]["ais"], "audio/x-wav");
-		       // wavesurfer.loadBlob(blob_wav);
+
+		       //converts BASE64 to arrayBuffer
+		       var tampon = sServObj.BASE64ToArrayBuffer(json_result["sequences"]["AUDIO"][0]["ais"]);
+		       //converts arrayBuffer to audioBuffer, which "starts" the app
+		       Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
+			   sServObj.setAudioBuffer(audioBuffer);
+		       }, function (errMess){
+			   console.log("Erreur " + errMess);
+		       });
 
 		       // enable buttons
 		       $('#pause').prop('disabled', false);
@@ -224,18 +158,4 @@ function run() {
 	       }
 	      );
     }
-}
-
-/********************************************************************************************
- *** Global initialisation functions
- ********************************************************************************************/
-$(document).ready(function() { });
-
-/**
- * Random RGBA color.
- */
-function randomColor(alpha) {
-    return 'rgba(' + [~~(Math.random() * 255), ~~(Math.random() * 255), ~~(Math.random() * 255),
-		      alpha || 1
-		     ] + ')';
 }

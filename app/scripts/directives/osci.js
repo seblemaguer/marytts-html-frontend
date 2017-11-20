@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.directive('osci', function (Drawhelperservice, fileService) {
+	.directive('osci', function (Drawhelperservice, MaryService) {
 		return {
 			templateUrl: 'views/osci.html',
 			restrict: 'E',
@@ -9,14 +9,19 @@ angular.module('MaryTTSHTMLFrontEnd')
 			scope: {},
 			link: function postLink(scope, element) {
 				var canvas = document.getElementById("osci");
-				console.log(canvas);
-				scope.fs = fileService;
+				scope.fs = MaryService;
+
+
+				scope.start = undefined;
+				scope.stop = undefined;
+
+
 				//get the canvas and draw the buffer when available
 				scope.$watch('fs.getAudioBuffer()', function(newValue, oldValue){
-					console.log("Valeur " + newValue);
 					if(newValue!==oldValue) {
-						console.log("Je suis dans le watch");
-						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, 0, fileService.audioBuffer.length, true);
+						scope.start = 0;
+						scope.stop = scope.fs.getAudioBuffer().length;
+						Drawhelperservice.freshRedrawDrawOsciOnCanvas(canvas, scope.start, scope.stop, true);
 					}
 				}, true);
 			}

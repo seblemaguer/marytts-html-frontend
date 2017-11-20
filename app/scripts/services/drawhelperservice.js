@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.service('Drawhelperservice', function Drawhelperservice(fileService, mathHelperService) {
+	.service('Drawhelperservice', function Drawhelperservice(MaryService, mathHelperService) {
 
 		//shared service object to be returned
 		var sServObj = {};
@@ -24,8 +24,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 		 *
 		 */
 		sServObj.calculateOsciPeaks = function () {
-			var sampleRate = fileService.audioBuffer.sampleRate;
-			var numberOfChannels = fileService.audioBuffer.numberOfChannels;
+			var sampleRate = MaryService.audioBuffer.sampleRate;
+			var numberOfChannels = MaryService.audioBuffer.numberOfChannels;
 
 			// TODO mix all channels
 
@@ -51,17 +51,17 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 			for(var channelIdx = 0; channelIdx < numberOfChannels; channelIdx++){
 
-				var curChannelSamples = fileService.audioBuffer.getChannelData(channelIdx);
+				var curChannelSamples = MaryService.audioBuffer.getChannelData(channelIdx);
 
 				// preallocate min max peaks arrays
-				var curChannelMaxPeaksWinSize0 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize0));
-				var curChannelMinPeaksWinSize0 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize0));
+				var curChannelMaxPeaksWinSize0 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize0));
+				var curChannelMinPeaksWinSize0 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize0));
 
-				var curChannelMaxPeaksWinSize1 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize1));
-				var curChannelMinPeaksWinSize1 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize1));
+				var curChannelMaxPeaksWinSize1 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize1));
+				var curChannelMinPeaksWinSize1 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize1));
 
-				var curChannelMaxPeaksWinSize2 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize2));
-				var curChannelMinPeaksWinSize2 = new Float32Array(Math.round(fileService.audioBuffer.length / winSize2));
+				var curChannelMaxPeaksWinSize2 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize2));
+				var curChannelMinPeaksWinSize2 = new Float32Array(Math.round(MaryService.audioBuffer.length / winSize2));
 
 				var curWindowIdxCounterWinSize0 = 0;
 				var curPeakIdxWinSize0 = 0;
@@ -261,12 +261,12 @@ angular.module('MaryTTSHTMLFrontEnd')
 		};
 
 		sServObj.calcSampleTime = function (sample) {
-			return (sample / fileService.audioBuffer.sampleRate) + 0.5 / fileService.audioBuffer.sampleRate;
+			return (sample / MaryService.audioBuffer.sampleRate) + 0.5 / MaryService.audioBuffer.sampleRate;
 		};
 
 		sServObj.getCurrentSample = function (perc) {
 			//return this.curViewPort.sS + (this.curViewPort.eS - this.curViewPort.sS) * perc;
-			return fileService.getAudioBuffer().length * perc;
+			return MaryService.getAudioBuffer().length * perc;
 		};
 
 		sServObj.getSampleDist = function (w) {
@@ -276,7 +276,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 		sServObj.getPos = function (w, s) {
 			//return (w * (s - this.curViewPort.sS) / (this.curViewPort.eS - this.curViewPort.sS + 1)); // + 1 because of view (displays all samples in view)
-			return (w * (s - 0) / (fileService.getAudioBuffer().length - 0 + 1)); // + 1 because of view (displays all samples in view)
+			return (w * (s - 0) / (MaryService.getAudioBuffer().length - 0 + 1)); // + 1 because of view (displays all samples in view)
 
 		};
 
@@ -401,7 +401,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 			}else{
 				// if winIdx is -1 then calculate the peaks from the channel data
 				//allPeakVals = sServObj.calculatePeaks(canvas, Soundhandlerservice.audioBuffer.getChannelData(viewState.osciSettings.curChannel), sS, eS);
-				allPeakVals = sServObj.calculatePeaks(canvas, fileService.audioBuffer.getChannelData(0), sS, eS);
+				allPeakVals = sServObj.calculatePeaks(canvas, MaryService.audioBuffer.getChannelData(0), sS, eS);
 				// check if envelope is to be drawn
 				if (allPeakVals.minPeaks && allPeakVals.maxPeaks && allPeakVals.samplePerPx >= 1) {
 					// draw envelope
@@ -514,6 +514,75 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 
 		/**
+		 * drawing method to drawMovingBoundaryLine
+		 */
+
+		sServObj.drawMovingBoundaryLine = function (ctx) {
+
+			var xOffset, sDist;
+			sDist = sServObj.getSampleDist(ctx.canvas.width);
+
+			// calc. offset dependant on type of level of mousemove  -> default is sample exact
+			xOffset = (sDist / 2);
+
+			/*if (viewState.movingBoundary) {
+				ctx.fillStyle = "#0000FF";
+				var p = Math.round(sServObj.getPos(ctx.canvas.width, viewState.movingBoundarySample));
+				if (viewState.getcurMouseisLast()) {
+					ctx.fillRect(p + sDist, 0, 1, ctx.canvas.height);
+				} else {
+					ctx.fillRect(p + xOffset, 0, 1, ctx.canvas.height);
+				}
+			}*/
+
+		};
+
+		/**
+		 * drawing method to drawMinMaxAndName
+		 * @param ctx is context to be drawn on
+		 * @param trackName name of track to be drawn in the center of the canvas (left aligned)
+		 * @param min value to be drawn at the bottom of the canvas (left aligned)
+		 * @param max value to be drawn at the top of the canvas (left aligned)
+		 * @param round value to round to for min/max values (== digits after comma)
+		 */
+		sServObj.drawMinMaxAndName = function (ctx, trackName, min, max, round) {
+			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.strokeStyle = "#000000";
+			ctx.fillStyle = "#000000";
+
+			/*var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+
+			// var scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
+			var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
+
+			var smallFontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 3 / 4;
+			var th = smallFontSize * scaleY;*/
+
+			// draw corner pointers
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.lineTo(5, 5);
+			ctx.moveTo(0, ctx.canvas.height);
+			ctx.lineTo(5, ctx.canvas.height - 5);
+			ctx.stroke();
+			ctx.closePath();
+
+			// draw trackName
+			/*if (trackName !== '') {
+				fontScaleService.drawUndistortedText(ctx, trackName, fontSize, ConfigProviderService.design.font.small.family, 0, ctx.canvas.height / 2 - fontSize * scaleY / 2, ConfigProviderService.design.color.black, true);
+			}
+
+			// draw min/max vals
+			if (max !== undefined) {
+				fontScaleService.drawUndistortedText(ctx, 'max: ' + mathHelperService.roundToNdigitsAfterDecPoint(max, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, 5, ConfigProviderService.design.color.grey, true);
+			}
+			// draw min/max vals
+			if (min !== undefined) {
+				fontScaleService.drawUndistortedText(ctx, 'min: ' + mathHelperService.roundToNdigitsAfterDecPoint(min, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, ctx.canvas.height - th - 5, ConfigProviderService.design.color.grey, true);
+			}*/
+		};
+
+		/**
 		 * drawing method to drawCurViewPortSelected
 		 */
 		sServObj.drawCurViewPortSelected = function (ctx, drawTimeAndSamples) {
@@ -523,21 +592,22 @@ angular.module('MaryTTSHTMLFrontEnd')
 			sDist = sServObj.getSampleDist(ctx.canvas.width);
 			xOffset = 0;
 
-			var posS = viewState.getPos(ctx.canvas.width, viewState.curViewPort.selectS);
-			var posE = viewState.getPos(ctx.canvas.width, viewState.curViewPort.selectE);
-
+			//pos start/end to change if needing to draw only a part of the signal
+			var posS = sServObj.getPos(ctx.canvas.width, 0); //viewState.curViewPort.selectS
+			var posE = sServObj.getPos(ctx.canvas.width, MaryService.audioBuffer.length); //viewState.curViewPort.selectE
 			if (posS === posE) {
 
-				ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+				ctx.fillStyle = 'rgba(0, 0, 0, 255)';
 				ctx.fillRect(posS + xOffset, 0, 2, ctx.canvas.height);
 
-				if (drawTimeAndSamples) {
+				/*if (drawTimeAndSamples) {
 					if (viewState.curViewPort.sS !== viewState.curViewPort.selectS && viewState.curViewPort.selectS !== -1) {
 						scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
-						space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), scaleX);
-						fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
+						space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / MaryService.audioBuffer.sampleRate, 6), scaleX);
+						fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / MaryService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
 					}
-				}
+				}*/
+
 			} else {
 				ctx.fillStyle = 'rgba(150, 150, 150, 0.5)';
 				ctx.fillRect(posS, 0, posE - posS, ctx.canvas.height);
@@ -550,29 +620,118 @@ angular.module('MaryTTSHTMLFrontEnd')
 				ctx.closePath();
 				ctx.stroke();
 
-				if (drawTimeAndSamples) {
+				/*if (drawTimeAndSamples) {
 					// start values
 					scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
-					space = getScaleWidth(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), scaleX);
-					fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectS, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectS / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posS - space - 5, 0, ConfigProviderService.design.color.black, false);
+					space = getScaleWidth(ctx, 0, mathHelperService.roundToNdigitsAfterDecPoint(0 / MaryService.audioBuffer.sampleRate, 6), scaleX);
+					//fontScaleService.drawUndistortedTextTwoLines(ctx, 0, mathHelperService.roundToNdigitsAfterDecPoint(0/ MaryService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posS - space - 5, 0, "#000000", false);
 
 					// end values
-					fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectE, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectE / fileService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
+					//fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.selectE, mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.selectE / MaryService.audioBuffer.sampleRate, 6), fontSize, ConfigProviderService.design.font.small.family, posE + 5, 0, ConfigProviderService.design.color.black, true);
 					// dur values
 					// check if space
-					space = getScale(ctx, mathHelperService.roundToNdigitsAfterDecPoint((viewState.curViewPort.selectE - viewState.curViewPort.selectS) / fileService.audioBuffer.sampleRate, 6), scaleX);
+					space = getScale(ctx, mathHelperService.roundToNdigitsAfterDecPoint((MaryService.audioBuffer.length - 0) / MaryService.audioBuffer.sampleRate, 6), scaleX);
 
 					if (posE - posS > space) {
-						var str1 = viewState.curViewPort.selectE - viewState.curViewPort.selectS - 1;
-						var str2 = mathHelperService.roundToNdigitsAfterDecPoint(((viewState.curViewPort.selectE - viewState.curViewPort.selectS) / fileService.audioBuffer.sampleRate), 6);
+						var str1 = MaryService.audioBuffer.length - 0 - 1;
+						var str2 = mathHelperService.roundToNdigitsAfterDecPoint(((MaryService.audioBuffer.length - 0) / MaryService.audioBuffer.sampleRate), 6);
 						space = getScaleWidth(ctx, str1, str2, scaleX);
 						//fontScaleService.drawUndistortedTextTwoLines(ctx, str1, str2, fontSize, ConfigProviderService.design.font.small.family, posS + (posE - posS) / 2 - space / 2, 0, '#000000', false);
 					}
-				}
+				}*/
 
 			}
 
 		};
+
+		/**
+		 * drawing method to drawCrossHairs
+		 */
+		//Not used curently ?
+		/*sServObj.drawCrossHairs = function (ctx, mouseEvt, min, max, unit, trackname) {
+			// console.log(mathHelperService.roundToNdigitsAfterDecPoint(min, round))
+			if (ConfigProviderService.vals.restrictions.drawCrossHairs) {
+
+				var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+				// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				ctx.strokeStyle = ConfigProviderService.design.color.transparent.red;
+				ctx.fillStyle = ConfigProviderService.design.color.transparent.red;
+
+				// see if Chrome -> dashed line
+				//if (navigator.vendor === 'Google Inc.') {
+				//	ctx.setLineDash([2]);
+				//}
+
+				// draw lines
+				var mouseX = viewState.getX(mouseEvt);
+				var mouseY = viewState.getY(mouseEvt);
+
+				//if (navigator.vendor === 'Google Inc.') {
+				//	ctx.setLineDash([0]);
+				//}
+
+				// draw frequency / sample / time
+				ctx.font = (ConfigProviderService.design.font.small.size + 'px ' + ConfigProviderService.design.font.small.family);
+				var mouseFreq = mathHelperService.roundToNdigitsAfterDecPoint(max - mouseY / ctx.canvas.height * max, 2); // SIC only uses max
+				var tW = ctx.measureText(mouseFreq + unit).width * fontScaleService.scaleX;
+				var tH = fontSize * fontScaleService.scaleY;
+				var s1 = Math.round(viewState.curViewPort.sS + mouseX / ctx.canvas.width * (viewState.curViewPort.eS - viewState.curViewPort.sS));
+				var s2 = mathHelperService.roundToNdigitsAfterDecPoint(viewState.getViewPortStartTime() + mouseX / ctx.canvas.width * (viewState.getViewPortEndTime() - viewState.getViewPortStartTime()), 6);
+
+                var y;
+                if(mouseY + tH < ctx.canvas.height){
+                    y = mouseY + 5;
+                }else{
+                    y = mouseY - tH - 5;
+                }
+
+				if (max !== undefined || min !== undefined) {
+					if (trackname === 'OSCI') {
+						// no horizontal values
+						ctx.beginPath();
+						//ctx.moveTo(0, mouseY);
+						//ctx.lineTo(5, mouseY + 5);
+						//ctx.moveTo(0, mouseY);
+						//ctx.lineTo(ctx.canvas.width, mouseY);
+						//ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					} else if (trackname === 'SPEC') {
+                        fontScaleService.drawUndistortedText(ctx, mouseFreq + unit, fontSize, ConfigProviderService.design.font.small.family, 5, y, ConfigProviderService.design.color.transparent.red, true);
+                        fontScaleService.drawUndistortedText(ctx, mouseFreq + unit, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - tW, y, ConfigProviderService.design.color.transparent.red, true);
+
+                        ctx.beginPath();
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(5, mouseY + 5);
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(ctx.canvas.width, mouseY);
+						ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					} else {
+						// draw min max an name of track
+						var tr = ConfigProviderService.getSsffTrackConfig(trackname);
+						var col = Ssffdataservice.getColumnOfTrack(tr.name, tr.columnName);
+						mouseFreq = col._maxVal - (mouseY / ctx.canvas.height * (col._maxVal - col._minVal));
+						mouseFreq = mathHelperService.roundToNdigitsAfterDecPoint(mouseFreq, 2); // crop
+						fontScaleService.drawUndistortedText(ctx, mouseFreq, fontSize, ConfigProviderService.design.font.small.family, 5, y, ConfigProviderService.design.color.transparent.red, true);
+						fontScaleService.drawUndistortedText(ctx, mouseFreq, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - 5 - tW, y, ConfigProviderService.design.color.transparent.red, true);
+						ctx.beginPath();
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(5, mouseY + 5);
+						ctx.moveTo(0, mouseY);
+						ctx.lineTo(ctx.canvas.width, mouseY);
+						ctx.lineTo(ctx.canvas.width - 5, mouseY + 5);
+						ctx.moveTo(mouseX, 0);
+						ctx.lineTo(mouseX, ctx.canvas.height);
+						ctx.stroke();
+					}
+				}
+				fontScaleService.drawUndistortedTextTwoLines(ctx, s1, s2, fontSize, ConfigProviderService.design.font.small.family, mouseX + 5, 0, ConfigProviderService.design.color.transparent.red, true);
+			}
+		};*/
 
 
         /**
@@ -580,70 +739,25 @@ angular.module('MaryTTSHTMLFrontEnd')
 		 * this is used to draw a red line at the current mouse position
 		 * on canvases where the mouse is currently not hovering over
          */
-        sServObj.drawCrossHairX = function(ctx, mouseX){
+        /*sServObj.drawCrossHairX = function(ctx, mouseX){
             ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5';
             ctx.beginPath();
             ctx.moveTo(mouseX, 0);
             ctx.lineTo(mouseX, ctx.canvas.height);
             ctx.stroke();
-        };
-
-		/**
-		 * drawing method to drawMinMaxAndName
-		 * @param ctx is context to be drawn on
-		 * @param trackName name of track to be drawn in the center of the canvas (left aligned)
-		 * @param min value to be drawn at the bottom of the canvas (left aligned)
-		 * @param max value to be drawn at the top of the canvas (left aligned)
-		 * @param round value to round to for min/max values (== digits after comma)
-		 */
-
-		/*sServObj.drawMinMaxAndName = function (ctx, trackName, min, max, round) {
-			// ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-			ctx.strokeStyle = '#000000';
-			ctx.fillStyle = '#000000';
-
-			var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
-
-			// var scaleX = ctx.canvas.width / ctx.canvas.offsetWidth;
-			var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
-
-			var smallFontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 3 / 4;
-			var th = smallFontSize * scaleY;
-
-			// draw corner pointers
-			ctx.beginPath();
-			ctx.moveTo(0, 0);
-			ctx.lineTo(5, 5);
-			ctx.moveTo(0, ctx.canvas.height);
-			ctx.lineTo(5, ctx.canvas.height - 5);
-			ctx.stroke();
-			ctx.closePath();
-
-			// draw trackName
-			if (trackName !== '') {
-				fontScaleService.drawUndistortedText(ctx, trackName, fontSize, ConfigProviderService.design.font.small.family, 0, ctx.canvas.height / 2 - fontSize * scaleY / 2, ConfigProviderService.design.color.black, true);
-			}
-
-			// draw min/max vals
-			if (max !== undefined) {
-				fontScaleService.drawUndistortedText(ctx, 'max: ' + mathHelperService.roundToNdigitsAfterDecPoint(max, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, 5, ConfigProviderService.design.color.grey, true);
-			}
-			// draw min/max vals
-			if (min !== undefined) {
-				fontScaleService.drawUndistortedText(ctx, 'min: ' + mathHelperService.roundToNdigitsAfterDecPoint(min, round), smallFontSize, ConfigProviderService.design.font.small.family, 5, ctx.canvas.height - th - 5, ConfigProviderService.design.color.grey, true);
-			}
-		};*/
+        };*/
 
 		/**
 		 *
 		 */
+		 //not used
 		/*sServObj.drawViewPortTimes = function (ctx) {
-			ctx.strokeStyle = ConfigProviderService.design.color.black;
-			ctx.fillStyle = ConfigProviderService.design.color.black;
-			ctx.font = (ConfigProviderService.design.font.small.size + ' ' + ConfigProviderService.design.font.small.family);
+			ctx.strokeStyle = "#000000";
+			ctx.fillStyle = "#000000";
+			//ctx.font = (ConfigProviderService.design.font.small.size + ' ' + ConfigProviderService.design.font.small.family);
 
-			var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
+			//var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
 
 			// lines to corners
 			ctx.beginPath();
@@ -659,8 +773,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 			var space;
 			if (viewState.curViewPort) {
 				//draw time and sample nr
-				sTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.sS / fileService.audioBuffer.sampleRate, 6);
-				eTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.eS / fileService.audioBuffer.sampleRate, 6);
+				sTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.sS  / MaryService.audioBuffer.sampleRate, 6);
+				eTime = mathHelperService.roundToNdigitsAfterDecPoint(viewState.curViewPort.eS / MaryService.audioBuffer.sampleRate, 6);
 				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.sS, sTime, fontSize, ConfigProviderService.design.font.small.family, 5, 0, ConfigProviderService.design.color.black, true);
 				space = getScaleWidth(ctx, viewState.curViewPort.eS, eTime, scaleX);
 				fontScaleService.drawUndistortedTextTwoLines(ctx, viewState.curViewPort.eS, eTime, fontSize, ConfigProviderService.design.font.small.family, ctx.canvas.width - space - 5, 0, ConfigProviderService.design.color.black, false);

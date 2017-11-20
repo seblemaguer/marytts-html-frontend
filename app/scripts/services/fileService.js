@@ -28,6 +28,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 		sServObj.convertData = function(file){
 			var reader = new FileReader();
 			var res;
+			//read .wav as arrayBuffer
 			reader.readAsArrayBuffer(file);
 			reader.onloadend = function (evt) {
 				if (evt.target.readyState === FileReader.DONE) {
@@ -36,14 +37,49 @@ angular.module('MaryTTSHTMLFrontEnd')
 					} else {
 						res = evt.currentTarget.result;
 					}
-					Wavparserservice.parseWavAudioBuf(res).then(function (audioBuffer) {
-						console.log("Audio Buffer : "+audioBuffer);
+					//converts arrayBuffer to BASE64
+					var tampon = sServObj.ArrayBufferToBASE64(res);
+					//converts BASE64 to arrayBuffer
+					tampon = sServObj.BASE64ToArrayBuffer(tampon);
+					//converts arrayBuffer to audioBuffer, which "starts" the app
+					Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
 						sServObj.setAudioBuffer(audioBuffer);
 					}, function (errMess){
 						console.log("Erreur " + errMess);
 					});
 				}
 			};
+		};
+
+		/**
+		* Converts ArrayBuffer to base64
+		*/
+
+		sServObj.ArrayBufferToBASE64 = function(buffer){
+			var binary = '';
+			var bytes = new Uint8Array(buffer);
+			var len = bytes.byteLength;
+			for (var i = 0; i < len; i++) {
+				binary += String.fromCharCode(bytes[i]);
+			}
+			var res = window.btoa(binary);
+			console.log(res);
+			return res;
+		}
+
+		/**
+		* Converts base64 to ArrayBuffer
+		*/
+		sServObj.BASE64ToArrayBuffer = function (stringBase64) {
+			var binaryString = window.atob(stringBase64);
+			var len = binaryString.length;
+			var bytes = new Uint8Array(len);
+			for (var i = 0; i < len; i++) {
+				var ascii = binaryString.charCodeAt(i);
+				bytes[i] = ascii;
+			}
+			console.log(bytes.buffer);
+			return bytes.buffer;
 		};
 
 		/**

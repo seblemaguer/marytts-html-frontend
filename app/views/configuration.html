@@ -1,7 +1,12 @@
-
 <div class="form-group" id="text_area">
     <label for="text-configuration" class="h4">User configuration of the system</label>
-    <textarea id="text-configuration" rows="12" class="form-control" name="configuration" tabindex="1">
+    <textarea
+	id="text-configuration"
+	rows="12"
+	name="configuration"
+	tabindex="1"
+	class="form-control code"
+	smart-area="areaConfig">
 # How to extract the input
 input_serializer=marytts.io.serializer.TextSerializer
 
@@ -24,6 +29,5 @@ modules=marytts.language.en.JTokenizer                  \
         marytts.modules.nlp.PronunciationModel          \
         marytts.modules.acoustic.TargetFeatureLister    \
 	marytts.pyhts.modules.HMMSynthesizer
-
     </textarea>
 </div>

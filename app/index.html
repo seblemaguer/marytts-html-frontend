@@ -21,12 +21,15 @@
 	<link rel="stylesheet" href="styles/marytts-custom.css">
 	<!-- endbuild -->
     </head>
+
     <body ng-app="MaryTTSHTMLFrontEnd">
 	<!--[if lte IE 8]>
 	    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
 
 	<!-- Add your site or application content here -->
+
+	<!--
 	<div class="header">
 	    <div class="jumbotron text-center">
 		<img src="images/marylogo.png" />
@@ -34,6 +37,7 @@
 		<p><a href="http://mary.dfki.de/" target="_blank" class="btn btn-default btn-sm">Learn more</a></p>
 	    </div>
 	</div>
+	-->
 
 	<div class="container">
 	    <div ng-view=""></div>
@@ -67,24 +71,22 @@
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
+        <script src="scripts/workers/spectroDrawingWorkerClass.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
+        <script src="scripts/controllers/run.js"></script>
         <script src="scripts/directives/configuration.js"></script>
         <script src="scripts/directives/audiocontrols.js"></script>
         <script src="scripts/directives/inputtext.js"></script>
         <script src="scripts/directives/textresults.js"></script>
         <script src="scripts/directives/osci.js"></script>
         <script src="scripts/directives/spectro.js"></script>
-        <script src="scripts/services/fileService.js"></script>
+        <script src="scripts/services/MaryService.js"></script>
         <script src="scripts/services/Wavparserservice.js"></script>
         <script src="scripts/services/browserDetector.js"></script>
         <script src="scripts/services/drawhelperservice.js"></script>
         <script src="scripts/services/mathhelperservice.js"></script>
         <script src="scripts/prototypeexpansions.js"></script>
-        <!-- endbuild -->
-
-	<!-- build:js({.tmp, app}) scripts/marytts.js -->
-        <script src="scripts/marytts-api.js"></script>
         <!-- endbuild -->
     </body>
 </html>
