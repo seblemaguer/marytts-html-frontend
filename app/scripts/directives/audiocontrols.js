@@ -1,14 +1,51 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.directive('audiocontrols', function (Drawhelperservice, MaryService) {
+    .directive('audiocontrols', function (MaryService, playService, appStateService) {
 		return {
 			templateUrl: 'views/audiocontrols.html',
 			restrict: 'E',
 			replace: true,
 			scope: {},
-			link: function postLink(scope, element) {
-			    // var canvas = document.getElementById("audiocontrols");
+			link: function postLink(scope,element){
+
+				scope.zoomIn = function(){
+					console.log("zoomIn");
+					//if start / stop !== undefined
+					//then change them
+				};
+
+				scope.zoomOut = function(){
+					console.log("zoomOut");
+					//if start / stop !== undefined
+					//change them
+				};
+
+				scope.toLeft = function(){
+					console.log("toLeft");
+					//if start / stop !== undefined
+					//change them
+				};
+
+				scope.toRight = function(){
+					console.log("toRight");
+					//if start / stop !== undefined
+					//change them
+				};
+
+				scope.play = function(){
+					//if audioBuffer !== undefined
+					//play it
+					if(MaryService.getAudioBuffer()!==undefined){
+						playService.playFromTo(0, MaryService.getAudioBuffer().length);
+					}
+				};
+
+				scope.pauseResume = function(){
+					if(MaryService.getAudioBuffer()!==undefined){
+						playService.pauseResume();
+					}
+				}
 			}
 		};
 	});
