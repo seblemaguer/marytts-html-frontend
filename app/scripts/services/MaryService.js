@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-    .service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector) {
+.service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector) {
 	// shared service object
 	var sServObj = {};
 	sServObj.audioBuffer = null;
@@ -10,107 +10,139 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	sServObj.process = function() {
 
-	    var input_text = $("#text-to-synth").val();
-	    var configuration = $("#text-configuration").val();
+		var input_text = $("#text-to-synth").val();
+		var configuration = $("#text-configuration").val();
 	    //validate input text
 	    if (input_text.length === 0) {
-		alert('text needs to be defined !');
+	    	alert('text needs to be defined !');
 	    } else if (configuration.length == 0) {
-		alert('configuration needs to be defined');
+	    	alert('configuration needs to be defined');
 	    } else {
 
-		$.post(sServObj.getBaseURL() + "process/", {
-		    "input": input_text,
-		    "configuration": configuration
-		}, function(result) {
+	    	$.post(sServObj.getBaseURL() + "process/", {
+	    		"input": input_text,
+	    		"configuration": configuration
+	    	}, function(result) {
 
-		    // FIXME: add log management
+			    // FIXME: add log management
 
-		    // FIXME: add exception management
+			    // FIXME: add exception management
 
-		    var result_content = result["result"];
-		    $("#text-result").val(result_content);
+			    var result_content = result["result"];
+			    $("#text-result").val(result_content);
 
-		    var json_result = JSON.parse(result_content);
+			    //If an exception occurs
+			    if("exception" in result && result["exception"]!=null){
+			    	$("#text-result").val(sServObj.exception_string(result["exception"]));
+			    	$("#text-result").css('background-color','red');
+			    	
+			    } else {
 
-		    if (json_result == null) {
-			return;
-		    }
-		    if ("audio" in json_result) {
-			$("#text-result").val(json_result["audio"]);
+			    	//background color in white if an expection occurs before
+			    	$("#text-result").css('background-color','white');
+			    	var json_result = JSON.parse(result_content);
+			    	console.log(json_result);
+			    	if (json_result == null) {
+			    		return;
+			    	}
+			    	if ("audio" in json_result) {
+			    		$("#text-result").val(json_result["audio"]);
 
-			//converts BASE64 to arrayBuffer
-			var tampon = sServObj.BASE64ToArrayBuffer(json_result["audio"]);
+						//converts BASE64 to arrayBuffer
+						var tampon = sServObj.BASE64ToArrayBuffer(json_result["audio"]);
 
-			//converts arrayBuffer to audioBuffer, which "starts" the app
-			Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-			    sServObj.setAudioBuffer(audioBuffer);
-			}, function (errMess){
-			    console.log("Erreur " + errMess);
-			});
+						//converts arrayBuffer to audioBuffer, which "starts" the app
+						Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
+							sServObj.setAudioBuffer(audioBuffer);
+						}, function (errMess){
+							console.log("Erreur " + errMess);
+						});
 
-			// wavesurfer.loadBlob(blob_wav);
-			$('#pause').prop('disabled', false);
-			$('#play').prop('disabled', false);
-			$('#save').prop('disabled', false);
+						// wavesurfer.loadBlob(blob_wav);
+						$('#pause').prop('disabled', false);
+						$('#play').prop('disabled', false);
+						$('#save').prop('disabled', false);
 
-			//reset pause button state
-			$('#pause').attr('data-state', 'off');
-			$('#pause-text').text('Pause');
-			$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+						//reset pause button state
+						$('#pause').attr('data-state', 'off');
+						$('#pause-text').text('Pause');
+						$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
 
 
-		    } else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
+					} else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
 
-			// Extract the wave
+						// Extract the wave
 
-			//converts BASE64 to arrayBuffer
-			var tampon = sServObj.BASE64ToArrayBuffer(json_result["sequences"]["AUDIO"][0]["ais"]);
+						//converts BASE64 to arrayBuffer
+						var tampon = sServObj.BASE64ToArrayBuffer(json_result["sequences"]["AUDIO"][0]["ais"]);
 
-			//converts arrayBuffer to audioBuffer, which "starts" the app
-			Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-			    sServObj.setAudioBuffer(audioBuffer);
-			}, function (errMess){
-			    console.log("Erreur " + errMess);
-			});
+						//converts arrayBuffer to audioBuffer, which "starts" the app
+						Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
+							sServObj.setAudioBuffer(audioBuffer);
+						}, function (errMess){
+							console.log("Erreur " + errMess);
+						});
 
-			// enable buttons
-			$('#pause').prop('disabled', false);
-			$('#play').prop('disabled', false);
-			$('#save').prop('disabled', false);
+						// enable buttons
+						$('#pause').prop('disabled', false);
+						$('#play').prop('disabled', false);
+						$('#save').prop('disabled', false);
 
-			//reset pause button state
-			$('#pause').attr('data-state', 'off');
-			$('#pause-text').text('Pause');
-			$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+						//reset pause button state
+						$('#pause').attr('data-state', 'off');
+						$('#pause-text').text('Pause');
+						$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
 
-			//scroll down to bottom
-			$("html, body").animate({scrollTop: $(document).height()}, 1000);
-		    } else {
-			$("#audio_results_area").prop("display", "none");
-		    }
-		}
-		      );
+						//scroll down to bottom
+						$("html, body").animate({scrollTop: $(document).height()}, 1000);
+					} else {
+						$("#audio_results_area").prop("display", "none");
+					}
+				}
+
+				if("log" in result){
+					//FIXME : no logs for now
+					$("#log").val(result["log"]);
+				}    
+			}
+		);
 	    }
 
 	};
 
+	//Function to create expection trace
+	sServObj.exception_string = function(result) {
+		if(result.cause == null) {
+			return result.message;
+		} else {
+			return result.message + "\n\t"+ sServObj.exception_rec_string(result.cause,1);
+		}
+	}
+
+	sServObj.exception_rec_string = function(result,n) {
+		if(result.cause == null) {
+			return result.message;
+		} else {
+			return result.message + "\n"+"\t".repeat(n+1) + sServObj.exception_rec_string(result.cause,n+1);
+		}
+	}
+
 	sServObj.getBaseURL = function () {
-	    return "http://" + sServObj.MARY_HOST + ":" + sServObj.MARY_PORT + "/";
+		return "http://" + sServObj.MARY_HOST + ":" + sServObj.MARY_PORT + "/";
 	};
 
 
 	/**
 	 * Converts file to an audiobuffer
 	 */
-	sServObj.convertData = function(b64_wav){
+	 sServObj.convertData = function(b64_wav){
 	    //converts BASE64 to arrayBuffer
 	    var tampon = sServObj.BASE64ToArrayBuffer(b64_wav);
 	    //converts arrayBuffer to audioBuffer, which "starts" the app
 	    Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-		sServObj.setAudioBuffer(audioBuffer);
+	    	sServObj.setAudioBuffer(audioBuffer);
 	    }, function (errMess){
-		console.log("Erreur " + errMess);
+	    	console.log("Erreur " + errMess);
 	    });
 	};
 
@@ -118,38 +150,38 @@ angular.module('MaryTTSHTMLFrontEnd')
 	 * Converts ArrayBuffer to base64
 	 */
 
-	sServObj.ArrayBufferToBASE64 = function(buffer){
-	    var binary = '';
-	    var bytes = new Uint8Array(buffer);
-	    var len = bytes.byteLength;
-	    for (var i = 0; i < len; i++) {
-		binary += String.fromCharCode(bytes[i]);
-	    }
-	    var res = window.btoa(binary);
-	    console.log(res);
-	    return res;
-	}
+	 sServObj.ArrayBufferToBASE64 = function(buffer){
+	 	var binary = '';
+	 	var bytes = new Uint8Array(buffer);
+	 	var len = bytes.byteLength;
+	 	for (var i = 0; i < len; i++) {
+	 		binary += String.fromCharCode(bytes[i]);
+	 	}
+	 	var res = window.btoa(binary);
+	 	console.log(res);
+	 	return res;
+	 }
 
 	/**
 	 * Converts base64 to ArrayBuffer
 	 */
-	sServObj.BASE64ToArrayBuffer = function (stringBase64) {
-	    var binaryString = window.atob(stringBase64);
-	    var len = binaryString.length;
-	    var bytes = new Uint8Array(len);
-	    for (var i = 0; i < len; i++) {
-		var ascii = binaryString.charCodeAt(i);
-		bytes[i] = ascii;
-	    }
-	    return bytes.buffer;
-	};
+	 sServObj.BASE64ToArrayBuffer = function (stringBase64) {
+	 	var binaryString = window.atob(stringBase64);
+	 	var len = binaryString.length;
+	 	var bytes = new Uint8Array(len);
+	 	for (var i = 0; i < len; i++) {
+	 		var ascii = binaryString.charCodeAt(i);
+	 		bytes[i] = ascii;
+	 	}
+	 	return bytes.buffer;
+	 };
 
 
 	/**
 	 * Sets the audioBuffer
 	 */
-	sServObj.setAudioBuffer = function(newBuffer){
-	    sServObj.audioBuffer = newBuffer;
+	 sServObj.setAudioBuffer = function(newBuffer){
+	 	sServObj.audioBuffer = newBuffer;
 	    //Something has changed, so we call $apply manually
 	    $rootScope.$apply();
 	};
@@ -158,9 +190,9 @@ angular.module('MaryTTSHTMLFrontEnd')
 	/**
 	 * Returns the audioBuffer
 	 */
-	sServObj.getAudioBuffer = function(){
-	    return sServObj.audioBuffer;
-	};
+	 sServObj.getAudioBuffer = function(){
+	 	return sServObj.audioBuffer;
+	 };
 
-	return sServObj;
-    });
+	 return sServObj;
+	});
