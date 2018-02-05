@@ -34,12 +34,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 			    //If an exception occurs
 			    if("exception" in result && result["exception"]!=null){
 			    	$("#text-result").val(sServObj.exception_string(result["exception"]));
-			    	$("#text-result").css('background-color','red');
+			    	$("#text-result").css('border-width','5px');
+			    	$("#text-result").css('border-color','red');
 			    	
 			    } else {
 
-			    	//background color in white if an expection occurs before
-			    	$("#text-result").css('background-color','white');
+			    	$("#text-result").css('border-width','5px');
+			    	$("#text-result").css('border-color','green');
 			    	var json_result = JSON.parse(result_content);
 			    	console.log(json_result);
 			    	if (json_result == null) {
@@ -112,19 +113,19 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	//Function to create expection trace
 	sServObj.exception_string = function(result) {
+		var str = result.message;
+		for(var num in result.stackTrace){
+			str += "\n\t" + sServObj.stacktrace_string(result.stackTrace[num]);
+		}
 		if(result.cause == null) {
-			return result.message;
+			return str;
 		} else {
-			return result.message + "\n\t"+ sServObj.exception_rec_string(result.cause,1);
+			return str + "\n"+ sServObj.exception_string(result.cause);
 		}
 	}
 
-	sServObj.exception_rec_string = function(result,n) {
-		if(result.cause == null) {
-			return result.message;
-		} else {
-			return result.message + "\n"+"\t".repeat(n+1) + sServObj.exception_rec_string(result.cause,n+1);
-		}
+	sServObj.stacktrace_string = function(stacktrace){
+		return stacktrace.className+"."+stacktrace.methodName+" ("+stacktrace.fileName+":"+stacktrace.lineNumber+") ";
 	}
 
 	sServObj.getBaseURL = function () {
