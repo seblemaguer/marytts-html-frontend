@@ -24,6 +24,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 		    "configuration": configuration
 		}, function(result) {
 
+		    // FIXME: add log management
+
+		    // FIXME: add exception management
+
 		    var result_content = result["result"];
 		    $("#text-result").val(result_content);
 
@@ -54,6 +58,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 			$('#pause').attr('data-state', 'off');
 			$('#pause-text').text('Pause');
 			$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+
 
 		    } else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
 
