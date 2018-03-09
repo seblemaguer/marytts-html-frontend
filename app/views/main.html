@@ -1,16 +1,73 @@
-<div class="row">
-    <div class="col-sm-6" id="synth_area">
+<div class="container" id="synth_area">
 	<inputtext></inputtext>
-    </div>
-    <div class="col-sm-6" id="configuration">
-	<configuration></configuration>
-    </div>
 </div>
 
-<div class="row" id="validation_part">
+<div class="container" id="module_sequence">
+    <form class="form-group">
+        <label class="col-form-label-lg" for="sequence_input">Sequence of modules</label>
+        <input class="form-control form-control-lg" id="sequence_input" type="text" readonly value="Module1 -> Module2 -> Module3" />
+    </form>
+</div>
+
+
+<ul class="nav nav-tabs" id="configtab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="configgui-tab" data-toggle="tab" href="#configgui" role="tab"  aria-controls="configgui" aria-selected="false">Module list</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="configtext-tab" data-toggle="tab" href="#configtext" role="tab" aria-controls="configtext" aria-selected="false">Manual configuration</a>
+    </li>
+</ul>
+<br />
+<div class="tab-content" id="configtabContent">
+  <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
+
+    <!-- GUI to add in a directive later -->
+    <div class="container">
+    <form class="form-group">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label class="control-label" for="categoriesInput">Categories</label>
+                <select multiple class="form-control" id="categoriesInput">
+                  <option>First cat.</option>
+                  <option>Second cat.</option>
+                  <option>Third cat.</option>
+                  <option>...</option>
+                </select>
+            </div>
+            <div class="form-group col-md4">
+                <label class="control-label" for="moduleList">Module list</label>
+                <select multiple class="form-control" id="moduleList">
+                    <option>First mod.</option>
+                    <option>Second mod.</option>
+                    <option>Third mod.</option>
+                    <option>...</option>
+                </select>
+            </div>
+            <div class="form-group col-md4">
+                <label class="control-label" for="descriptionInput">Description</label>
+                <textarea class="form-control" id="descriptionInput" readonly>Description of the module</textarea>
+            </div>
+    </div>
+    </form>
+</div>
+
+</div>
+<div class="tab-pane" id="configtext" role="tabpanel" aria-labelledby="configtext-tab"><configuration></configuration></div>
+</div>
+
+<br />
+
+<div class="container" id="validation_part">
     <div class="col-sm-12" ng-controller="runCtrl">
         <button class="btn btn-success btn-block btn-lg" name="synth" ng-click="process();" tabindex=2>Run</button>
     </div>
+</div>
+
+<div class="row" id="audio_results_area">
+    <osci></osci>
+    <spectro></spectro>
+    <audiocontrols></audiocontrols>
 </div>
 
 <br />
@@ -18,8 +75,3 @@
 <log></log>
 
 <br />
-<div class="row" id="audio_results_area">
-    <osci></osci>
-    <spectro></spectro>
-    <audiocontrols></audiocontrols>
-</div>

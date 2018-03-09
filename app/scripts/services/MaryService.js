@@ -24,10 +24,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    		"configuration": configuration
 	    	}, function(result) {
 
-			    // FIXME: add log management
-
-			    // FIXME: add exception management
-
 			    var result_content = result["result"];
 			    $("#text-result").val(result_content);
 
