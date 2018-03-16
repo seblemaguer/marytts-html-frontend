@@ -1,18 +1,24 @@
-<div class="container" id="synth_area">
+<div class="container p-3 mb-2" id="synth_area">
 	<inputtext></inputtext>
+    <div class="col-sm-12" ng-controller="runCtrl">
+        <button class="btn btn-success btn-block btn-lg" name="synth" ng-click="process();" tabindex=2>Run</button>
+    </div>
 </div>
 
-<div class="container" id="module_sequence">
-    <form class="form-group">
-        <label class="col-form-label-lg" for="sequence_input">Sequence of modules</label>
-        <input class="form-control form-control-lg" id="sequence_input" type="text" readonly value="Module1 -> Module2 -> Module3" />
-    </form>
-</div>
-
+<div class="container border border-primary rounded p-3 mb-2" id="module_sequence">
+    <h4>Module Sequence</h4>
+    <!-- Dbl click to add module, dbl click on the module to remove it -->
+    <h4 class="text-center"><span class="badge badge-danger">{{mss.input}}</span>
+        <span ng-repeat="module in mss.moduleSequence track by $index">
+            <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module}}</span>
+        </span>
+        <i class="fas fa-arrow-right"></i><span class="badge badge-danger">{{mss.output}}</span>
+     </h4>
+     <p class="text-secondary"><small>Double click on a module to remove it. You can't remove <span class="badge badge-danger">red modules</span> but you can replace them.</small></p>
 
 <ul class="nav nav-tabs" id="configtab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="configgui-tab" data-toggle="tab" href="#configgui" role="tab"  aria-controls="configgui" aria-selected="false">Module list</a>
+        <a class="nav-link" id="configgui-tab" data-toggle="tab" href="#configgui" role="tab"  aria-controls="configgui" aria-selected="false">Module list</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" id="configtext-tab" data-toggle="tab" href="#configtext" role="tab" aria-controls="configtext" aria-selected="false">Manual configuration</a>
@@ -20,58 +26,72 @@
 </ul>
 <br />
 <div class="tab-content" id="configtabContent">
-  <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
+    <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
 
     <!-- GUI to add in a directive later -->
     <div class="container">
-    <form class="form-group">
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label class="control-label" for="categoriesInput">Categories</label>
-                <select multiple class="form-control" id="categoriesInput">
-                  <option>First cat.</option>
-                  <option>Second cat.</option>
-                  <option>Third cat.</option>
-                  <option>...</option>
-                </select>
-            </div>
-            <div class="form-group col-md4">
+        <form class="form-group">
+            <div class="form-row">
+                <div class="form-group col">
+                    <label class="control-label" for="categoriesInput">Categories</label>
+                    <select size="3" class="form-control" id="categoriesInput">
+                      <option>First cat.</option>
+                      <option>Second cat.</option>
+                      <option>Third cat.</option>
+                      <option>...</option>
+                    </select>
+                </div>
+                <!-- Script to add for module selection -->
+                <div class="form-group col">
                 <label class="control-label" for="moduleList">Module list</label>
-                <select multiple class="form-control" id="moduleList">
-                    <option>First mod.</option>
-                    <option>Second mod.</option>
-                    <option>Third mod.</option>
+                <select size="3" class="form-control" id="moduleList">
+                    <option value="module1">First mod.</option>
+                    <option value="module2">Second mod.</option>
+                    <option value="module3">Third mod.</option>
                     <option>...</option>
                 </select>
+                </div>
+                <div class="form-group col">
+                    <label class="control-label" for="descriptionInput">Description</label>
+                    <textarea class="form-control" id="descriptionInput" readonly>Description of the module</textarea>
+                </div>
+                <div class="form-group col">
+                    <button class="btn btn-primary" type="button" id="addModuleButton" ng-click="mss.addModule()">Add the selected module</button>
+                </div>
             </div>
-            <div class="form-group col-md4">
-                <label class="control-label" for="descriptionInput">Description</label>
-                <textarea class="form-control" id="descriptionInput" readonly>Description of the module</textarea>
-            </div>
+        </form>
     </div>
-    </form>
+
+    </div>
+
+    <div class="tab-pane" id="configtext" role="tabpanel" aria-labelledby="configtext-tab">
+        <configuration></configuration>
+    </div>
 </div>
 
-</div>
-<div class="tab-pane" id="configtext" role="tabpanel" aria-labelledby="configtext-tab"><configuration></configuration></div>
 </div>
 
 <br />
 
-<div class="container" id="validation_part">
-    <div class="col-sm-12" ng-controller="runCtrl">
-        <button class="btn btn-success btn-block btn-lg" name="synth" ng-click="process();" tabindex=2>Run</button>
-    </div>
-</div>
-
-<div class="row" id="audio_results_area">
+<p>
+    <!-- Find a + sign -->
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#audio_results_area" aria-expanded="false" aria-controls="audio_results_area">Open audio results <i class="fas fa-plus-circle"></i> </button>
+</p>
+<div class="collapse border border-primary rounded p-3 mb-2" id="audio_results_area">
     <osci></osci>
     <spectro></spectro>
     <audiocontrols></audiocontrols>
 </div>
 
 <br />
-<textresults></textresults>
-<log></log>
 
+<p>
+    <!-- Find a + sign -->
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#server_results" aria-expanded="false" aria-controls="server_results">Open server results <i class="fas fa-plus-circle"></i></button>
+</p>
+
+<div class="collapse border border-primary rounded p-3 mb-2" id="server_results">
+    <textresults></textresults>
+    <log></log>
+</div>
 <br />
