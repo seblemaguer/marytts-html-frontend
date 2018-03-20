@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-    .directive('audiocontrols', function (MaryService, playService, appStateService) {
+    .directive('audiocontrols', function (MaryService, playService, appStateService,downloadService) {
 		return {
 			templateUrl: 'views/audiocontrols.html',
 			restrict: 'E',
@@ -44,6 +44,14 @@ angular.module('MaryTTSHTMLFrontEnd')
 				scope.pauseResume = function(){
 					if(MaryService.getAudioBuffer()!==undefined){
 						playService.pauseResume();
+					}
+				}
+
+				scope.download = function(){
+					if(MaryService.getAudioBuffer()){
+						var wavBuffer = downloadService.audioBufferToWav(MaryService.getAudioBuffer());
+						var data = new Blob([wavBuffer], { type: 'audio/wav' });
+    					FileSaver.saveAs(data, 'result.wav');
 					}
 				}
 			}

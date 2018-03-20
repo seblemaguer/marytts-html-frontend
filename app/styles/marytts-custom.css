@@ -18,3 +18,27 @@ textarea.form-control {
         padding-bottom: 25px !important;
     }
 }*/
+
+.osciContainer {
+  position: relative;
+}
+.spectroContainer {
+  position: relative;
+}
+.levelContainer {
+  position: relative;
+}
+
+.canvas1 {
+  position: relative;
+  width:100%;
+  z-index: 1;
+}
+
+.canvas2 {
+  position: absolute;
+  width:100%;
+  left: 0px;
+  top: 0px;
+  z-index: 2;
+}

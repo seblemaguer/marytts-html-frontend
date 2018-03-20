@@ -1,31 +1,30 @@
 'use strict';
 
-angular.module('emuwebApp')
-	.directive('level', function ($timeout, $animate, viewState, ConfigProviderService, Drawhelperservice, HistoryService, fontScaleService, modalService, LevelService, loadedMetaDataService, HierarchyLayoutService, DataService) {
+angular.module('MaryTTSHTMLFrontEnd')
+	.directive('level', function ($timeout, $animate, MaryService, fontScaleService, AnnotService,appStateService,Drawhelperservice,mouseService) {
 		return {
 			templateUrl: 'views/level.html',
 			restrict: 'E',
 			scope: {
-				level: '=',
-				idx: '='
+				levels: '='//,
+				//idx: '='
 			},
 			link: function postLink(scope, element) {
-				// select the needed DOM items from the template
-				var canvas = element.find('canvas');
-				scope.open = true; // attr.open; // not using attr.open any more because minification changes open="true" to open
-				scope.vs = viewState;
-				scope.hists = HistoryService;
-				scope.cps = ConfigProviderService;
-				scope.modal = modalService;
-				scope.lmds = loadedMetaDataService;
-				scope.hls = HierarchyLayoutService;
-				scope.ds = DataService;
-				scope.ls = LevelService;
 
+				//Now we can draw on the canvas -- levels contains each level
+
+				//select the needed DOM items from the template
+				scope.open = true; // attr.open; // not using attr.open any more because minification changes open="true" to open
+				scope.bs = MaryService;
+				scope.anots = AnnotService;
+				scope.ass = appStateService;
+				scope.ms = mouseService;
+
+				var canvas = element.find('.canvas1');
+				var canvas2 = element.find('.canvas2');
 				var levelCanvasContainer = element.find('div');
-				scope.levelDef = ConfigProviderService.getLevelDefinition(scope.level.name);
 				scope.backgroundCanvas = {
-					'background': ConfigProviderService.design.color.lightGrey
+					'background': "#E7E7E7"
 				};
 
 				scope.drawHierarchy = false; // 
@@ -33,80 +32,193 @@ angular.module('emuwebApp')
 				///////////////
 				// watches
 
-				scope.$watch('vs.lastUpdate', function (newValue, oldValue) {
+				//watch for levels datas
+				scope.$watch('levels', function (newValue, oldValue) {
 					if (newValue !== oldValue) {
 						scope.redraw();
 					}
 				});
 
-				//
-				scope.$watch('vs.curViewPort', function (newValue, oldValue) {
-					if (oldValue.sS !== newValue.sS || oldValue.eS !== newValue.eS || oldValue.windowWidth !== newValue.windowWidth) {
-						scope.drawLevelDetails();
-						scope.drawLevelMarkup();
-					} else {
-						scope.drawLevelMarkup();
+
+				//watches for zoom
+				scope.$watch('ass.getStart()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						scope.redraw();
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
-				}, true);
+				});
 
-				//
-				scope.$watch('vs.curMouseX', function () {
-					scope.drawLevelMarkup();
-				}, true);
 
-				//
-				scope.$watch('vs.curClickLevelName', function (newValue) {
-					if (newValue !== undefined) {
-						scope.drawLevelMarkup();
+				scope.$watch('ass.getStop()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						scope.redraw();
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
-				}, true);
+				});
 
-				//
-				scope.$watch('vs.movingBoundarySample', function () {
-					if (scope.level.name === scope.vs.curMouseLevelName) {
-						scope.drawLevelDetails();
+				//Watches for drawing the selected area
+				scope.$watch('ms.getSelectedAreaS()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
-					scope.drawLevelMarkup();
-				}, true);
+				});
 
-				//
-				scope.$watch('vs.movingBoundary', function () {
-					scope.drawLevelMarkup();
-				}, true);
-
-				//
-				scope.$watch('hists.movesAwayFromLastSave', function () {
-					scope.drawLevelDetails();
-					scope.drawLevelMarkup();
-
-				}, true);
-
-				//
-				scope.$watch('vs.curPerspectiveIdx', function () {
-					scope.drawLevelDetails();
-					scope.drawLevelMarkup();
-				}, true);
-
-				//
-				scope.$watch('lmds.getCurBndl()', function (newValue, oldValue) {
-					if (newValue.name !== oldValue.name || newValue.session !== oldValue.session) {
-						scope.drawLevelDetails();
-						scope.drawLevelMarkup();
+				scope.$watch('ms.getSelectedAreaE()', function (newValue, oldValue) {
+					if (newValue !== oldValue) {
+						canvas2 = element.find('.canvas2');
+						for(var i = 0; i<canvas2.length; i++){
+							Drawhelperservice.drawSelectedArea(canvas2[i]);
+						}
 					}
-				}, true);
+				});
+
+				//ADD a structure which contains all the levels and check which one is clicked
+				//Check the position with viewState.getX(x) * viewState.getSamplesPerPixelVal(x)
+				//Check which event is the closest levels.items.foreach.samplestart + sampledur
+
+				element.bind("click", function(event){
+						var eltID = event.target.parentElement.id;
+						//level type - choose between only drawing line or a selected area
+						var clickSample = scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
+						scope.levels.forEach(function(level){
+							if(level.name === eltID){
+								level.items.forEach(function(item){
+									if(level.type==="SEGMENT"){
+										if(clickSample >= item.sampleStart && clickSample < item.sampleStart + item.sampleDur){
+											scope.ms.setSelectedAreaS(item.sampleStart);
+											scope.ms.setSelectedAreaE(item.sampleStart+item.sampleDur);
+										}
+									} else if (level.type==="EVENT"){
+										var spaceLower = 0;
+										var spaceHigher = 0;
+										level.items.forEach(function (evt, index) {
+											if (index < level.items.length - 1) {
+												spaceHigher = evt.samplePoint + (level.items[index + 1].samplePoint - level.items[index].samplePoint) / 2;
+											} else {
+												spaceHigher = scope.bs.getAudioBuffer().length;
+											}
+											if (index > 0) {
+												spaceLower = evt.samplePoint - (level.items[index].samplePoint - level.items[index - 1].samplePoint) / 2;
+											} else {
+												spaceLower = 0;
+											}
+											if (clickSample <= spaceHigher && clickSample >= spaceLower) {
+												scope.ms.setSelectedAreaS(evt.samplePoint);
+												scope.ms.setSelectedAreaE(evt.samplePoint);
+											}
+										});
+									}
+									
+								});
+							}
+						});
+				});
+
+				element.bind("dblclick",function(event){
+					var eltID = event.target.parentElement.id;
+						//level type - choose between only drawing line or a selected area
+						var clickSample = scope.ass.getStart() + scope.ass.getX(event) * scope.ass.getSamplesPerPixelVal(event);
+						scope.levels.forEach(function(level){
+							if(level.name === eltID){
+								level.items.forEach(function(item){
+									if(level.type==="SEGMENT"){
+										if(clickSample >= item.sampleStart && clickSample < item.sampleStart + item.sampleDur){
+											scope.ass.setStartStop(item.sampleStart,(item.sampleStart+item.sampleDur));
+											scope.ms.setSelectedAreaS(item.sampleStart);
+											scope.ms.setSelectedAreaE(item.sampleStart+item.sampleDur);
+										}
+									}
+									
+								});
+							}
+						});
+				});
+
+				//mousemove for red drawing line
+				element.bind("mousemove", function(event){
+					//draw red line at the position of the mouse - update the mouseX and mouseY from mouseService - only draw vertical red line
+				});
+
+
+				//TODO Add marqueur to preselect levels + red lines
+
+				// //
+				// scope.$watch('vs.curViewPort', function (newValue, oldValue) {
+				// 	if (oldValue.sS !== newValue.sS || oldValue.eS !== newValue.eS || oldValue.windowWidth !== newValue.windowWidth) {
+				// 		scope.drawLevelDetails();
+				// 		scope.drawLevelMarkup();
+				// 	} else {
+				// 		scope.drawLevelMarkup();
+				// 	}
+				// }, true);
+
+				// //
+				// scope.$watch('vs.curMouseX', function () {
+				// 	scope.drawLevelMarkup();
+				// }, true);
+
+				// //
+				// scope.$watch('vs.curClickLevelName', function (newValue) {
+				// 	if (newValue !== undefined) {
+				// 		scope.drawLevelMarkup();
+				// 	}
+				// }, true);
+
+				// //
+				// scope.$watch('vs.movingBoundarySample', function () {
+				// 	if (scope.level.name === scope.vs.curMouseLevelName) {
+				// 		scope.drawLevelDetails();
+				// 	}
+				// 	scope.drawLevelMarkup();
+				// }, true);
+
+				// //
+				// scope.$watch('vs.movingBoundary', function () {
+				// 	scope.drawLevelMarkup();
+				// }, true);
+
+				// //
+				// scope.$watch('hists.movesAwayFromLastSave', function () {
+				// 	scope.drawLevelDetails();
+				// 	scope.drawLevelMarkup();
+
+				// }, true);
+
+				// //
+				// scope.$watch('vs.curPerspectiveIdx', function () {
+				// 	scope.drawLevelDetails();
+				// 	scope.drawLevelMarkup();
+				// }, true);
+
+				// //
+				// scope.$watch('lmds.getCurBndl()', function (newValue, oldValue) {
+				// 	if (newValue.name !== oldValue.name || newValue.session !== oldValue.session) {
+				// 		scope.drawLevelDetails();
+				// 		scope.drawLevelMarkup();
+				// 	}
+				// }, true);
 
 				//
 				/////////////////
 
 				scope.redraw = function () {
 					scope.drawLevelDetails();
-					scope.drawLevelMarkup();
+					//scope.drawLevelMarkup();
 				};
 
 				/**
 				 *
 				 */
-				scope.changeCurAttrDef = function (attrDefName, index) {
+				/*scope.changeCurAttrDef = function (attrDefName, index) {
 					var curAttrDef = scope.vs.getCurAttrDef(scope.level.name);
 					if (curAttrDef !== attrDefName) {
 						// curAttrDef = attrDefName;
@@ -123,12 +235,12 @@ angular.module('emuwebApp')
 							});
 						}
 					}
-				};
+				};*/
 
 				/**
 				 *
 				 */
-				scope.getAttrDefBtnColor = function (attrDefName) {
+				/*scope.getAttrDefBtnColor = function (attrDefName) {
 					var curColor;
 					var curAttrDef = scope.vs.getCurAttrDef(scope.level.name);
 					if (attrDefName === curAttrDef) {
@@ -141,222 +253,205 @@ angular.module('emuwebApp')
 						};
 					}
 					return curColor;
-				};
+				};*/
 
-				scope.updateView = function () {
-					if ($.isEmptyObject(scope.cps)) {
-						return;
-					}
-					scope.drawLevelDetails();
-				};
+				// scope.updateView = function () {
+				// 	if ($.isEmptyObject(scope.cps)) {
+				// 		return;
+				// 	}
+				// 	scope.drawLevelDetails();
+				// };
 
 
 				///////////////
 				// bindings
 
 				// on mouse leave reset viewState.
-				element.bind('mouseleave', function () {
-					scope.vs.setcurMouseItem(undefined, undefined, undefined);
-					scope.drawLevelMarkup();
-				});
+				// element.bind('mouseleave', function () {
+				// 	scope.vs.setcurMouseItem(undefined, undefined, undefined);
+				// 	scope.drawLevelMarkup();
+				// });
 
 				/**
-				 * draw level details
+				 * draw level details 
 				 */
 				scope.drawLevelDetails = function () {
+					canvas = element.find('.canvas1');
                     var labelFontFamily; // font family used for labels only
-                    var fontFamily = scope.cps.design.font.small.family; // font family used for everything else
-                    if(typeof scope.cps.vals.perspectives[scope.vs.curPerspectiveIdx].levelCanvases.labelFontFamily === "undefined"){
-                        labelFontFamily = scope.cps.design.font.small.family;
-                    }else{
-                        labelFontFamily = scope.cps.vals.perspectives[scope.vs.curPerspectiveIdx].levelCanvases.labelFontFamily;
-					}
+                    var fontFamily = "HelveticaNeue"; // found in EMU config
 
-                    var labelFontSize; // font family used for labels only
-					var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1; // font size used for everything else
-                    if(typeof scope.cps.vals.perspectives[scope.vs.curPerspectiveIdx].levelCanvases.fontPxSize === "undefined") {
-                        labelFontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
-                    }else{
-                        labelFontSize = scope.cps.vals.perspectives[scope.vs.curPerspectiveIdx].levelCanvases.labelFontPxSize;
-					}
+                    var labelFontSize = 12; // font family used for labels only
+					var fontSize = 12; // 12 px, found in EMU config
 
 
-					var curAttrDef = scope.vs.getCurAttrDef(scope.level.name);
 					var isOpen = element.parent().css('height') !== '25px';// ? false : true;
-					if ($.isEmptyObject(scope.level)) {
-						//console.log('undef levelDetails');
-						return;
-					}
-					if ($.isEmptyObject(scope.vs)) {
-						//console.log('undef viewState');
-						return;
-					}
-					if ($.isEmptyObject(scope.cps)) {
-						//console.log('undef config');
-						return;
-					}
 
 					// draw hierarchy if canvas is displayed
-					if(scope.drawHierarchy){
+					/*if(scope.drawHierarchy){
 						scope.drawHierarchyDetails();
-					}
+					}*/
+					var i = 0;
+					//Drawing loop in the canvas
+					scope.levels.forEach(function(level){
+						var curAttrDef = level.name;
+						var ctx = canvas[i++].getContext('2d'); //There a total of level * 2 canvas, 2 for each canvas (one for details, one for markups)
+						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+						ctx.fillStyle = "#E7E7E7";
+						ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+						//predef vars
+						var sDist, posS, posE;
 
+						sDist = scope.ass.getSampleDist(ctx.canvas.width);
 
-					var ctx = canvas[0].getContext('2d');
-					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-					//predef vars
-					var sDist, posS, posE;
-
-					sDist = scope.vs.getSampleDist(ctx.canvas.width);
-
-					// draw name of level and type
-					var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
-
-					if (scope.level.name === curAttrDef) {
-						if (isOpen) {
-							fontScaleService.drawUndistortedTextTwoLines(ctx, scope.level.name, '(' + scope.level.type + ')', fontSize, fontFamily, 4, ctx.canvas.height / 2 - fontSize * scaleY, ConfigProviderService.design.color.black, true);
+						// draw name of level and type
+						var scaleY = ctx.canvas.height / ctx.canvas.offsetHeight;
+						//DRAWS Phonetic (SEGMENT) - Tone (EVENT)
+						if (level.name === curAttrDef) {
+							if (isOpen) {
+								fontScaleService.drawUndistortedTextTwoLines(ctx, level.name, '(' + level.type + ')', fontSize, fontFamily, 4, ctx.canvas.height / 2 - fontSize * scaleY, "#000", true);
+							}
+							else {
+								fontSize -= 2;
+								fontScaleService.drawUndistortedText(ctx, level.name, fontSize, fontFamily, 4, ctx.canvas.height / 2 - (fontSize * scaleY / 2), "#000", true);
+							}
+						} else {
+							fontScaleService.drawUndistortedTextTwoLines(ctx, level.name + ':' + curAttrDef, '(' + level.type + ')', fontSize, fontFamily, 4, ctx.canvas.height / 2 - fontSize * scaleY, "#000", true);
 						}
-						else {
-							fontSize -= 2;
-							fontScaleService.drawUndistortedText(ctx, scope.level.name, fontSize, fontFamily, 4, ctx.canvas.height / 2 - (fontSize * scaleY / 2), ConfigProviderService.design.color.black, true);
-						}
-					} else {
-						fontScaleService.drawUndistortedTextTwoLines(ctx, scope.level.name + ':' + curAttrDef, '(' + scope.level.type + ')', fontSize, fontFamily, 4, ctx.canvas.height / 2 - fontSize * scaleY, ConfigProviderService.design.color.black, true);
-					}
 
-					var curID = -1;
+						var curID = -1;
 
-					// calculate generic max with of single char (m char used)
-					//var mTxtImg = fontScaleService.drawUndistortedText(ctx, 'm', fontSize - 2, labelFontFamily, ConfigProviderService.design.color.black);
-					var mTxtImgWidth = ctx.measureText('m').width * fontScaleService.scaleX;
+						// calculate generic max with of single char (m char used)
+						//var mTxtImg = fontScaleService.drawUndistortedText(ctx, 'm', fontSize - 2, labelFontFamily, "#000");
+						var mTxtImgWidth = ctx.measureText('m').width * fontScaleService.scaleX;
 
-					// calculate generic max with of single digit (0 digit used)
-					//var zeroTxtImg = fontScaleService.drawUndistortedText(ctx, '0', fontSize - 4, labelFontFamily, ConfigProviderService.design.color.black);
-					var zeroTxtImgWidth = ctx.measureText('0').width * fontScaleService.scaleX;
-					if (scope.level.type === 'SEGMENT') {
-						ctx.fillStyle = ConfigProviderService.design.color.black;
-						// draw segments
+						// calculate generic max with of single digit (0 digit used)
+						//var zeroTxtImg = fontScaleService.drawUndistortedText(ctx, '0', fontSize - 4, labelFontFamily, "#000");
+						var zeroTxtImgWidth = ctx.measureText('0').width * fontScaleService.scaleX;
+						if (level.type === 'SEGMENT') {
+							ctx.fillStyle = "#000";
+							// draw segments
 
-						scope.level.items.forEach(function (item) {
-							++curID;
+							level.items.forEach(function (item) {
+								++curID;
 
-							if (item.sampleStart >= scope.vs.curViewPort.sS &&
-								item.sampleStart <= scope.vs.curViewPort.eS || //within segment
-								item.sampleStart + item.sampleDur > scope.vs.curViewPort.sS &&
-								item.sampleStart + item.sampleDur < scope.vs.curViewPort.eS || //end in segment
-								item.sampleStart < scope.vs.curViewPort.sS &&
-								item.sampleStart + item.sampleDur > scope.vs.curViewPort.eS // within sample
-							) {
-								// get label
-								var curLabVal;
-								item.labels.forEach(function (lab) {
-									if (lab.name === curAttrDef) {
-										curLabVal = lab.value;
+								if (item.sampleStart >= scope.ass.getStart() &&
+									item.sampleStart <= scope.ass.getStop() || //within segment
+									item.sampleStart + item.sampleDur > scope.ass.getStart() &&
+									item.sampleStart + item.sampleDur < scope.ass.getStop() || //end in segment
+									item.sampleStart < scope.ass.getStart() &&
+									item.sampleStart + item.sampleDur > scope.ass.getStop() // within sample
+								) {
+									// get label
+									var curLabVal;
+									item.labels.forEach(function (lab) {
+										if (lab.name === curAttrDef) {
+											curLabVal = lab.value;
+										}
+									});
+									// draw segment start
+									posS = scope.ass.getPos(ctx.canvas.width, item.sampleStart);
+									posE = scope.ass.getPos(ctx.canvas.width, item.sampleStart + item.sampleDur + 1);
+
+									ctx.fillStyle = "#000";
+									ctx.fillRect(posS, 0, 2, ctx.canvas.height / 2);
+
+									//draw segment end
+									ctx.fillStyle = "#888";
+									ctx.fillRect(posE, ctx.canvas.height / 2, 2, ctx.canvas.height);
+
+									ctx.font = (fontSize - 2 + 'px' + ' ' + labelFontFamily);
+
+									//check for enough space to stroke text
+									if ((curLabVal !== undefined) && posE - posS > (mTxtImgWidth * curLabVal.length)) {
+										if (isOpen) {
+											fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, posS + (posE - posS) / 2, (ctx.canvas.height / 2) - (fontSize - 2) + 2, "#000", false);
+										} else {
+											fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, posS + (posE - posS) / 2, (ctx.canvas.height / 2) - fontSize + 2, "#000", false);
+										}
 									}
-								});
 
-								// draw segment start
-								posS = scope.vs.getPos(ctx.canvas.width, item.sampleStart);
-								posE = scope.vs.getPos(ctx.canvas.width, item.sampleStart + item.sampleDur + 1);
 
-								ctx.fillStyle = ConfigProviderService.design.color.black;
-								ctx.fillRect(posS, 0, 2, ctx.canvas.height / 2);
+									//draw helper lines
+									if (scope.open && curLabVal !== undefined && curLabVal.length !== 0) { // only draw if label is not empty
+										var labelCenter = posS + (posE - posS) / 2;
 
-								//draw segment end
-								ctx.fillStyle = ConfigProviderService.design.color.grey;
-								ctx.fillRect(posE, ctx.canvas.height / 2, 2, ctx.canvas.height);
+										var hlY = ctx.canvas.height / 4;
+										// start helper line
+										ctx.strokeStyle = "#000";
+										ctx.beginPath();
+										ctx.moveTo(posS, hlY);
+										ctx.lineTo(labelCenter, hlY);
+										ctx.lineTo(labelCenter, hlY + 5);
+										ctx.stroke();
 
-								ctx.font = (fontSize - 2 + 'px' + ' ' + labelFontFamily);
+										hlY = ctx.canvas.height / 4 * 3;
+										// end helper line
+										ctx.strokeStyle = "#888";
+										ctx.beginPath();
+										ctx.moveTo(posE, hlY);
+										ctx.lineTo(labelCenter, hlY);
+										ctx.lineTo(labelCenter, hlY - 5);
+										ctx.stroke();
+									}
 
-								//check for enough space to stroke text
-								if ((curLabVal !== undefined) && posE - posS > (mTxtImgWidth * curLabVal.length)) {
+									if (scope.open){
+										// draw sampleStart numbers
+										//check for enough space to stroke text
+										if (posE - posS > zeroTxtImgWidth * item.sampleStart.toString().length && isOpen) {
+											fontScaleService.drawUndistortedText(ctx, item.sampleStart, fontSize - 2, fontFamily, posS + 3, 0, "#888", true);
+										}
+
+										// draw sampleDur numbers.
+										var durtext = 'dur: ' + item.sampleDur + ' ';
+										//check for enough space to stroke text
+										if (posE - posS > zeroTxtImgWidth * durtext.length && isOpen) {
+											fontScaleService.drawUndistortedText(ctx, durtext, fontSize - 2, fontFamily, posE - (ctx.measureText(durtext).width * fontScaleService.scaleX), ctx.canvas.height / 4 * 3, "#888", true);
+										}
+									}
+								}
+							});
+						} else if (level.type === 'EVENT') {
+							ctx.fillStyle = "#000";
+							// predef. vars
+							var perc;
+
+							level.items.forEach(function (item) {
+								if (item.samplePoint > scope.ass.getStart() && item.samplePoint < scope.ass.getStop()) {
+									perc = Math.round(scope.ass.getPos(ctx.canvas.width, item.samplePoint) + (sDist / 2));
+									// get label
+									var curLabVal;
+									item.labels.forEach(function (lab) {
+										if (lab.name === curAttrDef) {
+											curLabVal = lab.value;
+										}
+									});
+
+									ctx.fillStyle = "#000";
+									ctx.fillRect(perc, 0, 1, ctx.canvas.height / 2 - ctx.canvas.height / 5);
+									ctx.fillRect(perc, ctx.canvas.height / 2 + ctx.canvas.height / 5, 1, ctx.canvas.height / 2 - ctx.canvas.height / 5);
+
+									fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, perc, (ctx.canvas.height / 2) - (fontSize - 2) + 2, "#000", false);
 									if (isOpen) {
-										fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, posS + (posE - posS) / 2, (ctx.canvas.height / 2) - (fontSize - 2) + 2, ConfigProviderService.design.color.black, false);
-									} else {
-										fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, posS + (posE - posS) / 2, (ctx.canvas.height / 2) - fontSize + 2, ConfigProviderService.design.color.black, false);
+										fontScaleService.drawUndistortedText(ctx, item.samplePoint, fontSize - 2, labelFontFamily, perc + 5, 0, "#888", true);
 									}
 								}
-
-								//draw helper lines
-								if (scope.open && curLabVal !== undefined && curLabVal.length !== 0) { // only draw if label is not empty
-									var labelCenter = posS + (posE - posS) / 2;
-
-									var hlY = ctx.canvas.height / 4;
-									// start helper line
-									ctx.strokeStyle = ConfigProviderService.design.color.black;
-									ctx.beginPath();
-									ctx.moveTo(posS, hlY);
-									ctx.lineTo(labelCenter, hlY);
-									ctx.lineTo(labelCenter, hlY + 5);
-									ctx.stroke();
-
-									hlY = ctx.canvas.height / 4 * 3;
-									// end helper line
-									ctx.strokeStyle = ConfigProviderService.design.color.grey;
-									ctx.beginPath();
-									ctx.moveTo(posE, hlY);
-									ctx.lineTo(labelCenter, hlY);
-									ctx.lineTo(labelCenter, hlY - 5);
-									ctx.stroke();
-								}
-
-								if (scope.open){
-									// draw sampleStart numbers
-									//check for enough space to stroke text
-									if (posE - posS > zeroTxtImgWidth * item.sampleStart.toString().length && isOpen) {
-										fontScaleService.drawUndistortedText(ctx, item.sampleStart, fontSize - 2, fontFamily, posS + 3, 0, ConfigProviderService.design.color.grey, true);
-									}
-
-									// draw sampleDur numbers.
-									var durtext = 'dur: ' + item.sampleDur + ' ';
-									//check for enough space to stroke text
-									if (posE - posS > zeroTxtImgWidth * durtext.length && isOpen) {
-										fontScaleService.drawUndistortedText(ctx, durtext, fontSize - 2, fontFamily, posE - (ctx.measureText(durtext).width * fontScaleService.scaleX), ctx.canvas.height / 4 * 3, ConfigProviderService.design.color.grey, true);
-									}
-								}
-							}
-						});
-					} else if (scope.level.type === 'EVENT') {
-						ctx.fillStyle = ConfigProviderService.design.color.black;
-						// predef. vars
-						var perc;
-
-						scope.level.items.forEach(function (item) {
-							if (item.samplePoint > scope.vs.curViewPort.sS && item.samplePoint < scope.vs.curViewPort.eS) {
-								perc = Math.round(scope.vs.getPos(ctx.canvas.width, item.samplePoint) + (sDist / 2));
-								// get label
-								var curLabVal;
-								item.labels.forEach(function (lab) {
-									if (lab.name === curAttrDef) {
-										curLabVal = lab.value;
-									}
-								});
-
-								ctx.fillStyle = ConfigProviderService.design.color.black;
-								ctx.fillRect(perc, 0, 1, ctx.canvas.height / 2 - ctx.canvas.height / 5);
-								ctx.fillRect(perc, ctx.canvas.height / 2 + ctx.canvas.height / 5, 1, ctx.canvas.height / 2 - ctx.canvas.height / 5);
-
-								fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, perc, (ctx.canvas.height / 2) - (fontSize - 2) + 2, ConfigProviderService.design.color.black, false);
-								if (isOpen) {
-									fontScaleService.drawUndistortedText(ctx, item.samplePoint, fontSize - 2, labelFontFamily, perc + 5, 0, ConfigProviderService.design.color.grey, true);
-								}
-							}
-						});
-					}
+							});
+						}
+					});
+				
 					// draw cursor/selected area
 				};
 
 				/**
 				 *
 				 */
-				scope.drawLevelMarkup = function () {
+				/*scope.drawLevelMarkup = function () {
 					var ctx = canvas[1].getContext('2d');
 					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-					if (scope.level.name === scope.vs.getcurClickLevelName()) {
-						ctx.fillStyle = ConfigProviderService.design.color.transparent.grey;
-						ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-					}
+					// if (scope.level.name === scope.vs.getcurClickLevelName()) {
+					// 	ctx.fillStyle = ConfigProviderService.design.color.transparent.grey;
+					// 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+					// }
 
 					// draw moving boundary line if moving
 					Drawhelperservice.drawMovingBoundaryLine(ctx);
@@ -366,16 +461,16 @@ angular.module('emuwebApp')
 
 
 					var posS, posE, sDist, xOffset, item;
-					posS = scope.vs.getPos(ctx.canvas.width, scope.vs.curViewPort.selectS);
-					posE = scope.vs.getPos(ctx.canvas.width, scope.vs.curViewPort.selectE);
-					sDist = scope.vs.getSampleDist(ctx.canvas.width);
+					posS = scope.ass.getPos(ctx.canvas.width, scope.ass.getStart());
+					posE = scope.ass.getPos(ctx.canvas.width, scope.ass.getStop());
+					sDist = scope.ass.getSampleDist(ctx.canvas.width);
 
 
 					var segMId = scope.vs.getcurMouseItem();
 					var isFirst = scope.vs.getcurMouseisFirst();
 					var isLast = scope.vs.getcurMouseisLast();
 					var clickedSegs = scope.vs.getcurClickItems();
-					var levelId = scope.vs.getcurClickLevelName();
+					var levelId = scope.vs.getcurClickLevelName(); // TODO Fix those variables - ie create a mouse manager
 					if (clickedSegs !== undefined) {
 						// draw clicked on selected areas
 						if (scope.level.name === levelId && clickedSegs.length > 0) {
@@ -383,16 +478,16 @@ angular.module('emuwebApp')
 								if (cs !== undefined) {
 									// check if segment or event level
 									if (cs.sampleStart !== undefined) {
-										posS = Math.round(scope.vs.getPos(ctx.canvas.width, cs.sampleStart));
-										posE = Math.round(scope.vs.getPos(ctx.canvas.width, cs.sampleStart + cs.sampleDur + 1));
+										posS = Math.round(scope.ass.getPos(ctx.canvas.width, cs.sampleStart));
+										posE = Math.round(scope.ass.getPos(ctx.canvas.width, cs.sampleStart + cs.sampleDur + 1));
 									} else {
-										posS = Math.round(scope.vs.getPos(ctx.canvas.width, cs.samplePoint) + sDist / 2);
+										posS = Math.round(scope.ass.getPos(ctx.canvas.width, cs.samplePoint) + sDist / 2);
 										posS = posS - 5;
 										posE = posS + 10;
 									}
-									ctx.fillStyle = ConfigProviderService.design.color.transparent.yellow;
+									ctx.fillStyle = "rgba(255, 255, 22, 0.35)";
 									ctx.fillRect(posS, 0, posE - posS, ctx.canvas.height);
-									ctx.fillStyle = ConfigProviderService.design.color.black;
+									ctx.fillStyle = "#000";
 								}
 							});
 						}
@@ -426,48 +521,13 @@ angular.module('emuwebApp')
 
 							}
 						}
-						ctx.fillStyle = ConfigProviderService.design.color.black;
+						ctx.fillStyle = "#000";
 
 					}
 
 					// draw cursor
 					Drawhelperservice.drawCrossHairX(ctx, viewState.curMouseX);
-				};
-
-				/**
-				 * draw level hierarchy
-				 */
-				scope.drawHierarchyDetails = function () {
-					var fontSize = ConfigProviderService.design.font.small.size.slice(0, -2) * 1;
-					var paths = scope.hls.findPaths(scope.level.name);
-					var curPath = paths[1];
-
-					var ctx = canvas[0].getContext('2d');
-					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-					//var mTxtImgWidth = ctx.measureText('m').width * fontScaleService.scaleX;
-
-					ctx.strokeStyle = ConfigProviderService.design.color.black;
-
-					// find parents for every parent for every items hence building the annotation graph
-					scope.hls.findParents(curPath);
-
-					// draw ghost level
-					for(var i = 0; i < curPath.length; i++){
-						var curLevel = scope.ls.getLevelDetails(curPath[i]);
-						var levelHeight = ctx.canvas.height / curPath.length;
-						var curStartY = ctx.canvas.height - (i + 1) * levelHeight;
-						for(var itemIdx = 0; itemIdx < curLevel.items.length; itemIdx++){
-							var posS = Math.round(scope.vs.getPos(ctx.canvas.width, curLevel.items[itemIdx]._derivedSampleStart));
-							var posE = Math.round(scope.vs.getPos(ctx.canvas.width, curLevel.items[itemIdx]._derivedSampleEnd));
-							ctx.strokeRect(posS, curStartY , posE - posS, curStartY + levelHeight);
-
-							// draw label
-							fontScaleService.drawUndistortedText(ctx, curLevel.items[itemIdx].labels[0].value, fontSize - 2, ConfigProviderService.design.font.small.family, posS + (posE - posS) / 2 - ctx.measureText(curLevel.items[itemIdx].labels[0].value).width / 2 - 2, curStartY + levelHeight / 2, ConfigProviderService.design.color.black, true);
-						}
-					}
-
-				};
+				};*/
 
 			}
 		};
