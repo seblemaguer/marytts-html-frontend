@@ -19,7 +19,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 		* Sets the annotation
 		*/
 		sServObj.setAnnotFromTextGrid = function(text){
-			console.log("TEST");
 			sServObj.textGrid = text;
 		};
 
@@ -30,6 +29,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 		sServObj.setAnnotFromJSON = function(text){
 			sServObj.annot = JSON.parse(text);
 		};
+
+		sServObj.setAnnot = function(text){
+			sServObj.annot = text;
+		};		
 
 		//Used after putting the wav file
 		sServObj.convertTextGrid = function(sampleRate){

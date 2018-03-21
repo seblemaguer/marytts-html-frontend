@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-.service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector) {
+.service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector,AnnotService,appStateService) {
 	// shared service object
 	var sServObj = {};
-	sServObj.audioBuffer = null;
+	sServObj.audioBuffer = undefined;
 	sServObj.MARY_HOST = "localhost";
 	sServObj.MARY_PORT = "59125";
 
@@ -24,8 +24,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    		"configuration": configuration
 	    	}, function(result) {
 
-			    var result_content = result["result"];
-			    $("#text-result").val(result_content);
+	    		var result_content = result["result"];
+	    		$("#text-result").val(result_content);
 
 			    //If an exception occurs
 			    if("exception" in result && result["exception"]!=null){
@@ -94,7 +94,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 						$("html, body").animate({scrollTop: $(document).height()}, 1000);
 					} else {
 						$("#audio_results_area").prop("display", "none");
-					}
+					} //else if textgrid
+					/*{
+						sServObj.createBuffer();
+						var json = "";
+					}*/
 				}
 
 				if("log" in result){
@@ -102,7 +106,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 					$("#log").val(result["log"]);
 				}    
 			}
-		);
+			);
 	    }
 
 	};
@@ -179,8 +183,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 	 */
 	 sServObj.setAudioBuffer = function(newBuffer){
 	 	sServObj.audioBuffer = newBuffer;
+	 	appStateService.setMinMax(0,sServObj.audioBuffer.length);
+		appStateService.setStartStop(0,sServObj.audioBuffer.length);
 	    //Something has changed, so we call $apply manually
-	    $rootScope.$apply();
+	    //$rootScope.$apply();
 	};
 
 
@@ -190,6 +196,15 @@ angular.module('MaryTTSHTMLFrontEnd')
 	 sServObj.getAudioBuffer = function(){
 	 	return sServObj.audioBuffer;
 	 };
+
+	 /**
+	 *	Create a new buffer (empty), used to trick when printing levels without real audiobuffer -- See testlevel in main controller
+	 */
+	sServObj.createBuffer= function(){
+		var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	  	var buffer = audioCtx.createBuffer(1, 58089, 20000);
+	  	sServObj.setAudioBuffer(buffer);
+	}
 
 	 return sServObj;
 	});
