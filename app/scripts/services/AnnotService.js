@@ -18,8 +18,9 @@ angular.module('MaryTTSHTMLFrontEnd')
 		/**
 		* Sets the annotation
 		*/
-		sServObj.setAnnotFromTextGrid = function(text){
+		sServObj.setAnnotFromTextGrid = function(text,sampleRate){
 			sServObj.textGrid = text;
+			sServObj.convertTextGrid(sampleRate);
 		};
 
 
@@ -30,20 +31,19 @@ angular.module('MaryTTSHTMLFrontEnd')
 			sServObj.annot = JSON.parse(text);
 		};
 
-		sServObj.setAnnot = function(text){
+		/*sServObj.setAnnot = function(text){
 			sServObj.annot = text;
-		};		
+		};		*/
 
 		//Used after putting the wav file
 		sServObj.convertTextGrid = function(sampleRate){
 			Textgridparserservice.asyncParseTextGrid(sServObj.textGrid, sampleRate, "annotTextGrid", "annotTextGrid").then(function (parseMess) {
 				sServObj.annot = parseMess;
 				//Something has changed, so we call $apply manually -- removed because of bugs
-				console.log(sServObj.annot);
 			}, function (errMess) {
 				console.log("error : "+errMess);
 			});
-		}
+		};
 
 		/**
 		* Returns the annotation
