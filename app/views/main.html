@@ -10,7 +10,7 @@
     <!-- Dbl click to add module, dbl click on the module to remove it -->
     <h4 class="text-center"><span class="badge badge-danger">{{mss.input}}</span>
         <span ng-repeat="module in mss.moduleSequence track by $index">
-            <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module}}</span>
+            <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module}} </span>
         </span>
         <i class="fas fa-arrow-right"></i><span class="badge badge-danger">{{mss.output}}</span>
      </h4>
