@@ -28,7 +28,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	    $scope.$watch('fs.configuration', function(newVal,oldVal){
 	            if(newVal!==oldVal){
-	            	console.log(newVal);
 	            	$scope.configuration = JSON.stringify($scope.fs.configuration,null,4);
 	            }
 	    });
@@ -45,8 +44,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 	  			});
 	  		}
 	  	});
-	  	console.log($scope.fs.configuration);
 	  	$scope.mss.setModuleSequence($scope.fs.configuration["marytts.runutils.Request"]["module_sequence"]);
+	  	$scope.mss.setInput($scope.fs.configuration["marytts.runutils.Request"]["input_serializer"]);
+	  	$scope.mss.setOutput($scope.fs.configuration["marytts.runutils.Request"]["output_serializer"]);
+
 	    $scope.configuration = JSON.stringify($scope.fs.configuration,null,4);
 
 	  	$scope.testLevel = function(){

@@ -221,12 +221,20 @@ angular.module('MaryTTSHTMLFrontEnd')
 	}
 
 	sServObj.setConfiguration = function(newConfig){
-		console.log(newConfig);
-		if(("marytts.runutils.Request" in newConfig) && ("module_sequence" in newConfig["marytts.runutils.Request"])){
-				console.log("test");
-				moduleSequenceService.setModuleSequence(newConfig["marytts.runutils.Request"]["module_sequence"]);
-				sServObj.configuration = newConfig;
+		if("marytts.runutils.Request" in newConfig){
+			if("module_sequence" in newConfig["marytts.runutils.Request"]){
+					moduleSequenceService.setModuleSequence(newConfig["marytts.runutils.Request"]["module_sequence"]);
+					sServObj.configuration = newConfig;
+			}
+			if("input_serializer" in newConfig["marytts.runutils.Request"]){
+					moduleSequenceService.setInput(newConfig["marytts.runutils.Request"]["input_serializer"]);
+			}
+			if("output_serializer" in newConfig["marytts.runutils.Request"]){
+					moduleSequenceService.setOutput(newConfig["marytts.runutils.Request"]["output_serializer"]);
+			}
 		}
+
+
 	}
 
 	 return sServObj;
