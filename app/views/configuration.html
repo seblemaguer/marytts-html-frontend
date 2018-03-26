@@ -1,18 +1,5 @@
 <div class="form-group" id="text_area">
     <label for="text-configuration" class="h4">User configuration of the system</label>
     <textarea id="text-configuration" rows="6" name="configuration"
-	      tabindex="1" class="form-control code" smart-area="areaConfig">
-{
-    "marytts.runutils.Request": {
-	"input_serializer": "marytts.io.serializer.TextSerializer",
-	"output_serializer": "marytts.io.serializer.ROOTSJSONSerializer",
-	"module_sequence": [
-	    "marytts.language.en.JTokenizer",
-            "marytts.language.en.Preprocess",
-            "marytts.language.en.OpenNLPPosTagger",
-            "marytts.language.en.USJPhonemiser"
-	]
-    }
-}
-    </textarea>
+	      tabindex="1" class="form-control code" smart-area="areaConfig" ng-model="configuration"></textarea>
 </div>

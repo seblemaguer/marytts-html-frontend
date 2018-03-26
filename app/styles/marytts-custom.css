@@ -1,14 +1,7 @@
-.form-control:focus{
-    border-color: #18bc9c !important;
-}
 .glyphicon-2x {
     font-size: 30px;
 }
 
-textarea.form-control {
-    font-size: 19px;
-    font-weight: bold;
-}
 .container {
     width:1280px;
 }

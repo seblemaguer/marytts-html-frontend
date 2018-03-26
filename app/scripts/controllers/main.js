@@ -26,6 +26,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 	            }
 	    });
 
+	    $scope.$watch('fs.configuration', function(newVal,oldVal){
+	            if(newVal!==oldVal){
+	            	console.log(newVal);
+	            	$scope.configuration = JSON.stringify($scope.fs.configuration,null,4);
+	            }
+	    });
+
 
 	  	$scope.$watch('as.getAnnot()', function(newVal,oldVal){
 	  		if(newVal!==oldVal){
@@ -38,9 +45,12 @@ angular.module('MaryTTSHTMLFrontEnd')
 	  			});
 	  		}
 	  	});
+	  	console.log($scope.fs.configuration);
+	  	$scope.mss.setModuleSequence($scope.fs.configuration["marytts.runutils.Request"]["module_sequence"]);
+	    $scope.configuration = JSON.stringify($scope.fs.configuration,null,4);
 
 	  	$scope.testLevel = function(){
-	  			$scope.fs.createBuffer();
+	  			$scope.fs.loadStaticBuffer();
 	  			var annotJson = {
 	  			"name": "msajc003",
 	  			"annotates": "msajc003.wav",

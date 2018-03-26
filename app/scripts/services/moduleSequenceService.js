@@ -10,17 +10,28 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	sServObj.input = "Input";
 	sServObj.output = "Output";
-	sServObj.moduleSequence = [];
+	sServObj.moduleSequence = []; //Do a json
 
 	sServObj.addModule = function(){
 		if($("#moduleList").val()){
 			sServObj.moduleSequence.push($("#moduleList").val());
 		}
-	}
+	};
 
 	sServObj.removeModule = function(i){
 		sServObj.moduleSequence.splice(i, 1);
-	}
+	};
+
+	sServObj.resetModule = function(){
+		sServObj.input = "Input";
+		sServObj.output = "Output";
+		sServObj.moduleSequence = [];	
+	};
+
+	sServObj.setModuleSequence = function(newSequence){
+		sServObj.moduleSequence = newSequence;
+		console.log(sServObj.moduleSequence);
+	};
 
 	return sServObj;
 });

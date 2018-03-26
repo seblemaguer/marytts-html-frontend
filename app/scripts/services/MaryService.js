@@ -1,12 +1,28 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-.service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector,AnnotService,appStateService) {
+.service('MaryService', function MaryService($rootScope,Wavparserservice,browserDetector,AnnotService,appStateService,moduleSequenceService) {
 	// shared service object
 	var sServObj = {};
 	sServObj.audioBuffer = undefined;
+	sServObj.configuration = {
+    "marytts.runutils.Request": {
+	"input_serializer": "marytts.io.serializer.TextSerializer",
+	"output_serializer": "marytts.io.serializer.ROOTSJSONSerializer",
+	"module_sequence": [
+	    "marytts.language.en.JTokenizer",
+            "marytts.language.en.Preprocess",
+            "marytts.language.en.OpenNLPPosTagger",
+            "marytts.language.en.USJPhonemiser"
+	]
+    }
+};
+
 	sServObj.MARY_HOST = "localhost";
 	sServObj.MARY_PORT = "59125";
+
+	var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	sServObj.staticBuffer = audioCtx.createBuffer(1, 58089, 20000); //use loadStaticBuffer to load this buffer
 
 	sServObj.process = function() {
 
@@ -200,10 +216,17 @@ angular.module('MaryTTSHTMLFrontEnd')
 	 /**
 	 *	Create a new buffer (empty), used to trick when printing levels without real audiobuffer -- See testlevel in main controller
 	 */
-	sServObj.createBuffer= function(){
-		var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-	  	var buffer = audioCtx.createBuffer(1, 58089, 20000);
-	  	sServObj.setAudioBuffer(buffer);
+	sServObj.loadStaticBuffer= function(){
+	  	sServObj.setAudioBuffer(sServObj.staticBuffer);
+	}
+
+	sServObj.setConfiguration = function(newConfig){
+		console.log(newConfig);
+		if(("marytts.runutils.Request" in newConfig) && ("module_sequence" in newConfig["marytts.runutils.Request"])){
+				console.log("test");
+				moduleSequenceService.setModuleSequence(newConfig["marytts.runutils.Request"]["module_sequence"]);
+				sServObj.configuration = newConfig;
+		}
 	}
 
 	 return sServObj;
