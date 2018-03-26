@@ -272,7 +272,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 						//First line
 						var pixelStart = (mouseService.getSelectedAreaS() - appStateService.getStart()) / appStateService.getSamplesPerPixelValCanvas(canvas);
 						var pixelEnd = (mouseService.getSelectedAreaE() - appStateService.getStart()) / appStateService.getSamplesPerPixelValCanvas(canvas);
-						console.log(pixelStart+" "+pixelEnd);
 						ctx.fillStyle = "#000";
 						ctx.beginPath();
             			ctx.moveTo(pixelStart, 0);
