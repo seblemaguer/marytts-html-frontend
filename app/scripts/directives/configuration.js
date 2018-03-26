@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
-	.directive('configuration', function (Drawhelperservice, MaryService) {
+	.directive('configuration', function (MaryService) {
 		return {
 			templateUrl: 'views/configuration.html',
 			restrict: 'E',
