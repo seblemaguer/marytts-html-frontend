@@ -107,6 +107,13 @@ TextGridParserWorker.prototype = {
 						continue;
 					}
 					if (inHeader) {
+						var cLSplit = cL.split("=");
+						if(cLSplit[0]==="xmin"){
+							labelJSO.length = cLSplit[1];
+						}
+						if(cLSplit[0]==="xmax"){
+							labelJSO.length = (cLSplit[1] - labelJSO.length)*sampleRate;
+						}
 						continue;
 					}
 

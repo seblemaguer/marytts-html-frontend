@@ -13,7 +13,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 		sServObj.textGrid = undefined;
 
-
+		sServObj.getAnnotLength = function(){
+			if(sServObj.annot){
+				return sServObj.annot.length;
+			}
+		}
 
 		/**
 		* Sets the annotation
