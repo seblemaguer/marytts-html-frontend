@@ -30,8 +30,16 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	sServObj.setModuleSequence = function(newSequence){
 		sServObj.moduleSequence = newSequence;
-		console.log(sServObj.moduleSequence);
 	};
+
+	sServObj.setInput = function(newInput){
+		sServObj.input = newInput;
+	};
+
+	sServObj.setOutput = function(newOutput){
+		sServObj.output = newOutput;
+	};
+
 
 	return sServObj;
 });
