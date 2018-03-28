@@ -19,12 +19,15 @@ angular.module('MaryTTSHTMLFrontEnd')
 			}
 		}
 
+		sServObj.setAnnotLength = function(newLength){
+			sServObj.annot.length = newLength;
+		}
 		/**
 		* Sets the annotation
 		*/
-		sServObj.setAnnotFromTextGrid = function(text,sampleRate){
-			sServObj.textGrid = text;
-			sServObj.convertTextGrid(sampleRate);
+		sServObj.setAnnotFromTextGrid = function(text,sampleRate,imposeLength){
+				sServObj.textGrid = text;
+				sServObj.convertTextGrid(sampleRate,imposeLength);
 		};
 
 
@@ -40,10 +43,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 		};		*/
 
 		//Used after putting the wav file
-		sServObj.convertTextGrid = function(sampleRate){
+		sServObj.convertTextGrid = function(sampleRate,imposeLength){
 			Textgridparserservice.asyncParseTextGrid(sServObj.textGrid, sampleRate, "annotTextGrid", "annotTextGrid").then(function (parseMess) {
 				sServObj.annot = parseMess;
 				//Something has changed, so we call $apply manually -- removed because of bugs
+				if(imposeLength){
+					sServObj.annot.length = imposeLength;
+				}
 			}, function (errMess) {
 				console.log("error : "+errMess);
 			});

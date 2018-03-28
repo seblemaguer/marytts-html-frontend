@@ -8,11 +8,11 @@
 <div class="container border border-primary rounded p-3 mb-2" id="module_sequence">
     <h4>Module Sequence</h4>
     <!-- Dbl click to add module, dbl click on the module to remove it -->
-    <h4 class="text-center"><span class="badge badge-danger">{{mss.input}}</span>
+    <h4 class="text-center"><span class="badge badge-danger">{{mss.input.split(".")[mss.input.split(".").length-1]}}</span>
         <span ng-repeat="module in mss.moduleSequence track by $index">
-            <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module}} </span>
+            <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module.split(".")[module.split(".").length-1]}} </span>
         </span>
-        <i class="fas fa-arrow-right"></i><span class="badge badge-danger">{{mss.output}}</span>
+        <i class="fas fa-arrow-right"></i><span class="badge badge-danger">{{mss.output.split(".")[mss.output.split(".").length-1]}}</span>
      </h4>
      <p class="text-secondary"><small>Double click on a module to remove it. You can't remove <span class="badge badge-danger">red modules</span> but you can replace them.</small></p>
 
