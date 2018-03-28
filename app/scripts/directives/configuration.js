@@ -12,11 +12,22 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 			    scope.$watch("configuration",function(newVal,oldVal){
 			    	if(oldVal!==newVal){
-			    		try{
-			    			var config = JSON.parse(newVal);
-			    			MaryService.setConfiguration(config);
-			    		}catch (error){
-			    			//console.log(error);
+			    		if(newVal===""){
+			    			var emptyConf = {
+			    				"marytts.runutils.Request": {
+			    					"input_serializer": "",
+			    					"output_serializer": "",
+			    					"module_sequence": []
+			    				}
+			    			};
+			    			MaryService.setConfiguration(emptyConf);
+			    		} else {
+			    			try{
+			    				var config = JSON.parse(newVal);
+			    				MaryService.setConfiguration(config);
+			    			}catch (error){
+			    				//console.log(error);
+			    			}
 			    		}
 			    	}
 			    });

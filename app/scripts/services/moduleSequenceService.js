@@ -23,8 +23,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 	};
 
 	sServObj.resetModule = function(){
-		sServObj.input = "Input";
-		sServObj.output = "Output";
+		sServObj.input = "";
+		sServObj.output = "";
 		sServObj.moduleSequence = [];	
 	};
 
