@@ -46,13 +46,14 @@ angular.module('MaryTTSHTMLFrontEnd')
 			    //If an exception occurs
 			    if("exception" in result && result["exception"]!=null){
 			    	$("#text-result").val(sServObj.exception_string(result["exception"]));
-			    	$("#text-result").css('border-width','5px');
-			    	$("#text-result").css('border-color','red');
+			    	$("#server_results").css('border-width','5px');
+			    	$("#server_results").css('border-color','red');
+			    	$("#server_results").collapse('show');
 			    	
 			    } else {
 
-			    	$("#text-result").css('border-width','5px');
-			    	$("#text-result").css('border-color','green');
+			    	$("#server_results").css('border-width','5px');
+			    	$("#server_results").css('border-color','green');
 			    	var json_result = JSON.parse(result_content);
 			    	console.log(json_result);
 			    	if (json_result == null) {
