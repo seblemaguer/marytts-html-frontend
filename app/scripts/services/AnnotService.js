@@ -2,7 +2,7 @@
 
 
 /**
-* Service that contains the audioBuffer 
+* Service that contains the audioBuffer
 * May start the application (listeners to audioBuffer)
 */
 angular.module('MaryTTSHTMLFrontEnd')
@@ -34,18 +34,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 		/**
 		* Sets the annotation
 		*/
-		sServObj.setAnnotFromJSON = function(text){
-			sServObj.annot = JSON.parse(text);
+		sServObj.setAnnotFromJSON = function(json){
+			sServObj.annot = json;
 		};
 
-		sServObj.setAnnot = function(text){
-			sServObj.annot = text;
-		};
-
-
-		/*sServObj.setAnnot = function(text){
-			sServObj.annot = text;
-		};		*/
+		// sServObj.setAnnot = function(json){
+		// 	sServObj.annot = json;
+		// };
 
 		//Used after putting the wav file
 		sServObj.convertTextGrid = function(sampleRate,imposeLength){

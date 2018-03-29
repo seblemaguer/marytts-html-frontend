@@ -28,7 +28,8 @@
 <div class="tab-content" id="configtabContent">
     <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
 
-    <!-- GUI to add in a directive later -->
+      <!-- GUI to add in a directive later -->
+      <div class="container" ng-init="fs.listModules()">
         <form class="form-group">
             <div class="form-row">
                 <div class="form-group col">
@@ -39,26 +40,21 @@
                             <th>Configuration</th>
                         </thead>
                         <tbody>
-                            <tr>                    
-                                <td><select size="4" class="form-control" id="categoriesInput">
-                                    <option>First cat.</option>
-                                    <option>Second cat.</option>
-                                    <option>Third cat.</option>
-                                    <option>...</option>
+                            <tr>
+                                <td><select size="4" class="form-control" id="categoriesInput" ng-click="fs.listModulesFromCurrentCategory()">
++                      <option>Not filled</option>
                                 </select></td>
-                                <td><select size="4" class="form-control" id="moduleList">
-                                    <option value="module1">First mod.</option>
-                                    <option value="module2">Second mod.</option>
-                                    <option value="module3">Third mod.</option>
-                                    <option>...</option>
+                                <td><select size="4" class="form-control" id="moduleList" ng-click="fs.getCurrentModuleDescription()">
++                    <option value="module1">Not filled</option>
                                 </select></td>
                                 <td>
-                                    <textarea class="form-control" id="descriptionInput" rows="3">{  }</textarea>
+                                    <textarea class="form-control" id="configurationInput" rows="3">{  }</textarea>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-            </div>
+		</div>
+	    </div>
         </div>
         <!-- Add ng-if to check which category is selected, in order to display different buttons if it is serializer-->
             <div class="form-group col">

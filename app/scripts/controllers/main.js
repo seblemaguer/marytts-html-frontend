@@ -61,7 +61,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    $scope.configuration = JSON.stringify($scope.fs.configuration,null,4);
 
 	  	$scope.testLevel = function(){
-	  			$scope.fs.loadStaticBuffer();
+	  	    $scope.fs.loadStaticBuffer(20000, 58089);
 	  			var annotJson = {
 	  			"name": "msajc003",
 	  			"annotates": "msajc003.wav",
@@ -1377,7 +1377,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	  		        }
 	  		    ]
 	  		};
-	  		$scope.as.setAnnot(annotJson);
+	  		$scope.as.setAnnotFromJSON(annotJson);
 	  	}
 
 
