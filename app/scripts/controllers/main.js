@@ -42,6 +42,26 @@ angular.module('MaryTTSHTMLFrontEnd')
 	            }
 	    },true);
 
+	    $scope.$watch('mss.input', function(newVal,oldVal){
+	            if(newVal!==oldVal){
+	            	var tampon = JSON.parse($scope.configuration);
+	            	tampon["marytts.runutils.Request"]["module_sequence"] = $scope.mss.moduleSequence;
+	            	tampon["marytts.runutils.Request"]["input_serializer"] = $scope.mss.input;
+	            	tampon["marytts.runutils.Request"]["output_serializer"] = $scope.mss.output;
+	            	$scope.configuration = JSON.stringify(tampon,null,4);
+	            }
+	    });
+
+	    $scope.$watch('mss.output', function(newVal,oldVal){
+	            if(newVal!==oldVal){
+	            	var tampon = JSON.parse($scope.configuration);
+	            	tampon["marytts.runutils.Request"]["module_sequence"] = $scope.mss.moduleSequence;
+	            	tampon["marytts.runutils.Request"]["input_serializer"] = $scope.mss.input;
+	            	tampon["marytts.runutils.Request"]["output_serializer"] = $scope.mss.output;
+	            	$scope.configuration = JSON.stringify(tampon,null,4);
+	            }
+	    });
+
 
 	  	$scope.$watch('as.getAnnot()', function(newVal,oldVal){
 	  		if(newVal!==oldVal){

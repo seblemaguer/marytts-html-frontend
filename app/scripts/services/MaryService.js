@@ -27,6 +27,7 @@ angular.module('MaryTTSHTMLFrontEnd')
     sServObj.staticBuffer = null;
 
     sServObj.listModules = function() {
+    	$("#inputOutputButtonDiv").hide(); //hide the buttons to change input/output
 	$.post(sServObj.getBaseURL() + "listAvailableModulesByCategories/",
 	       {},
 	       function(result) {
@@ -57,7 +58,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 
     sServObj.listModulesFromCurrentCategory = function() {
-
+    if($("#categoriesInput").val()==="serializer"){
+    	$("#moduleButtonDiv").hide();
+    	$("#inputOutputButtonDiv").show(); //show input/output buttons
+    } else {
+    	$("#moduleButtonDiv").show();
+    	$("#inputOutputButtonDiv").hide(); //show add module buttons
+    }
 	var category = $("#categoriesInput option:selected").text()
 	$("#moduleList").children().remove();
 	// Add modules from the first category
@@ -104,16 +111,14 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 		//If an exception occurs
 		if("exception" in result && result["exception"]!=null){
+			$("#server_results").collapse('show');
 		    $("#text-result").val(sServObj.exception_string(result["exception"]));
-		    $("#server_results").css('border-width','5px');
-		    $("#server_results").css('border-color','red');
-		    $("#server_results").collapse('show');
+		    $("#server_results").removeClass('border-primary border-success border-danger').addClass('border-danger');
+
 
 		} else {
-
-		    $("#server_results").css('border-width','5px');
-		    $("#server_results").css('border-color','green');
-
+		    $("#audio_results").collapse('show');
+		    $("#server_results").removeClass('border-primary border-success border-danger').addClass('border-success');
 		    // FIXME: hardcoded
 		    var dur = 71;
 		    var sr = 48000;
