@@ -74,3 +74,11 @@
     background: #4CAF50; /* Green background */
     cursor: pointer; /* Cursor on hover */
 }
+
+.border-danger {
+  border-width : 5px !important;
+}
+
+.border-success {
+  border-width : 5px !important;
+}

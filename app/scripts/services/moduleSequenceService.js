@@ -40,6 +40,18 @@ angular.module('MaryTTSHTMLFrontEnd')
 		sServObj.output = newOutput;
 	};
 
+	sServObj.setInputFromButton = function(){
+		if($("#moduleList").val()){
+			sServObj.input = $("#moduleList").val();
+		}
+	};
+
+	sServObj.setOutputFromButton = function(){
+		if($("#moduleList").val()){
+			sServObj.output = $("#moduleList").val();
+		}
+	};
+
 
 	return sServObj;
 });

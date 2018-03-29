@@ -43,8 +43,9 @@
                             <tr>
                                 <td><select size="4" class="form-control" id="categoriesInput" ng-click="fs.listModulesFromCurrentCategory()">
 +                      <option>Not filled</option>
+                        <option>serializer</option>
                                 </select></td>
-                                <td><select size="4" class="form-control" id="moduleList" ng-click="fs.getCurrentModuleDescription()">
+                                <td><select size="4" class="form-control" id="moduleList" ng-click="fs.getCurrentModuleDescription()" ng-dblclick="mss.addModule()">
 +                    <option value="module1">Not filled</option>
                                 </select></td>
                                 <td>
@@ -57,10 +58,15 @@
 	    </div>
         </div>
         <!-- Add ng-if to check which category is selected, in order to display different buttons if it is serializer-->
-            <div class="form-group col">
+            <span class="form-group col" id="moduleButtonDiv">
                     <button class="btn btn-primary" type="button" id="addModuleButton" ng-click="mss.addModule()">Add the selected module</button>
-                    <button class="btn btn-primary" type="button" id="showDescription" data-toggle="modal" data-target="#descriptionModal">Show description</button>
-            </div>
+            </span>
+            <span class="form-group col" id="inputOutputButtonDiv">
+                    <button class="btn btn-danger" type="button" id="inputButton" ng-click="mss.setInputFromButton()">Set selected module as input</button>
+                    <button class="btn btn-danger" type="button" id="outputButton" ng-click="mss.setOutputFromButton()">Set selected module as output</button>
+            </span>
+            <button class="btn btn-primary" type="button" id="showDescription" data-toggle="modal" data-target="#descriptionModal">Show description</button>
+
         </form>
     </div>
 
