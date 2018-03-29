@@ -1,9 +1,23 @@
-<div id="audiocontrols" class="text-center">
-    <button class="btn btn-primary" id="play" name="play" ng-click="play();">
-        <i class="fas fa-play"></i> Play
-    </button>
-	<button class="btn btn-dark" id="download" name="download" ng-click="download();">
-    	<i class="fas fa-download"></i> Download
-	</button>
-</div>
+<div>
+	<div id="audiocontrols" class="text-center">
+	    <button class="btn btn-primary" id="play" name="play" ng-click="play();">
+	        <i class="fas fa-play"></i> Play
+	    </button>
+		<button class="btn btn-primary" id="zoomIn" name="zoomIn" ng-click="zoomIn();">
+			<i class="fas fa-search-plus"></i></i> Zoom in
+		</button>
+		<button class="btn btn-primary" id="zoomOut" name="zoomOut" ng-click="zoomOut();">
+			<i class="fas fa-search-minus"></i></i> Zoom out
+		</button>
+		<button class="btn btn-dark" id="download" name="download" ng-click="download();">
+		   	<i class="fas fa-download"></i> Download
+		</button>
+	</div>
+
+	<br /> <br />
+
+	<div class="slidecontainer">
+		<label for="shifting_bar">Shift</label>
+		<input type="range" class="slider" name="shifting_bar" id="shifting_bar" ng-mouseup="shift($event)" min="{{app.startMin}}" max="{{app.stopMax}}"/>
+	</div>
 </div>
