@@ -38,6 +38,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 			sServObj.annot = JSON.parse(text);
 		};
 
+		sServObj.setAnnot = function(text){
+			sServObj.annot = text;
+		};
+
+
 		/*sServObj.setAnnot = function(text){
 			sServObj.annot = text;
 		};		*/

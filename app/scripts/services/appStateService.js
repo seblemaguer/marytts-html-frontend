@@ -16,14 +16,12 @@ angular.module('MaryTTSHTMLFrontEnd')
 		sServObj.startMin = undefined;
 		sServObj.stopMax = undefined;
 
-		//mouse variables
-		sServObj.movingS = undefined;
-		sServObj.movingE = undefined;
+		//step for shifting
 
 		//set the start and the stop of the signal
 		sServObj.setStartStop = function(newStart,newStop){
 			if(newStart<sServObj.startMin){
-				newStart = 0;
+				newStart = sServObj.startMin;
 			}
 			if(newStop>sServObj.stopMax){
 				newStop=sServObj.stopMax;
@@ -46,16 +44,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 		//get stop
 		sServObj.getStop = function(){
 			return sServObj.stopSignal;
-		}
-
-		//get movingS
-		sServObj.getMovingS = function(){
-			return sServObj.movingS;
-		}
-
-		//get movingE
-		sServObj.getMovingE = function(){
-			return sServObj.movingE;
 		}
 
 		/**
