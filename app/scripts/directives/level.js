@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME: see for duration placement
+
 angular.module('MaryTTSHTMLFrontEnd')
 	.directive('level', function ($timeout, $animate, MaryService, fontScaleService, AnnotService,appStateService,Drawhelperservice,mouseService) {
 		return {
@@ -27,7 +29,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 					'background': "#E7E7E7"
 				};
 
-				scope.drawHierarchy = false; // 
+				scope.drawHierarchy = false; //
 
 				///////////////
 				// watches
@@ -117,7 +119,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 											}
 										});
 									}
-									
+
 								});
 							}
 						});
@@ -137,7 +139,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 											scope.ms.setSelectedAreaE(item.sampleStart+item.sampleDur);
 										}
 									}
-									
+
 								});
 							}
 						});
@@ -273,15 +275,15 @@ angular.module('MaryTTSHTMLFrontEnd')
 				// });
 
 				/**
-				 * draw level details 
+				 * draw level details
 				 */
 				scope.drawLevelDetails = function () {
 					canvas = element.find('.canvas1');
                     var labelFontFamily; // font family used for labels only
                     var fontFamily = "HelveticaNeue"; // found in EMU config
 
-                    var labelFontSize = 12; // font family used for labels only
-					var fontSize = 12; // 12 px, found in EMU config
+                    var labelFontSize = 20; // font family used for labels only
+					var fontSize = 18; // 12 px, found in EMU config
 
 
 					var isOpen = element.parent().css('height') !== '25px';// ? false : true;
@@ -296,7 +298,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 						var curAttrDef = level.name;
 						var ctx = canvas[i++].getContext('2d'); //There a total of level * 2 canvas, 2 for each canvas (one for details, one for markups)
 						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-						ctx.fillStyle = "#E7E7E7";
+					    ctx.fillStyle = "#FFFFFF"; // "#E7E7E7";
 						ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 						//predef vars
 						var sDist, posS, posE;
@@ -398,14 +400,17 @@ angular.module('MaryTTSHTMLFrontEnd')
 										// draw sampleStart numbers
 										//check for enough space to stroke text
 										if (posE - posS > zeroTxtImgWidth * item.sampleStart.toString().length && isOpen) {
-											fontScaleService.drawUndistortedText(ctx, item.sampleStart, fontSize - 2, fontFamily, posS + 3, 0, "#888", true);
+										    var sr = scope.anots.getSampleRate();
+										    var starttext =  Math.round(item.sampleStart/sr*1000)/1000;
+											fontScaleService.drawUndistortedText(ctx, starttext, fontSize - 2, fontFamily, posS + 3, 0, "#000", true);
 										}
 
-										// draw sampleDur numbers.
-										var durtext = 'dur: ' + item.sampleDur + ' ';
+									    // draw sampleDur numbers.
+									    var sr = scope.anots.getSampleRate();
+										var durtext = 'dur: ' + Math.round(item.sampleDur/sr*1000)/1000 + ' ';
 										//check for enough space to stroke text
 										if (posE - posS > zeroTxtImgWidth * durtext.length && isOpen) {
-											fontScaleService.drawUndistortedText(ctx, durtext, fontSize - 2, fontFamily, posE - (ctx.measureText(durtext).width * fontScaleService.scaleX), ctx.canvas.height / 4 * 3, "#888", true);
+											fontScaleService.drawUndistortedText(ctx, durtext, fontSize - 2, fontFamily, posE - (ctx.measureText(durtext).width * fontScaleService.scaleX), ctx.canvas.height / 4 * 3, "#000", true);
 										}
 									}
 								}
@@ -432,13 +437,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 									fontScaleService.drawUndistortedText(ctx, curLabVal, labelFontSize - 2, labelFontFamily, perc, (ctx.canvas.height / 2) - (fontSize - 2) + 2, "#000", false);
 									if (isOpen) {
-										fontScaleService.drawUndistortedText(ctx, item.samplePoint, fontSize - 2, labelFontFamily, perc + 5, 0, "#888", true);
+										fontScaleService.drawUndistortedText(ctx, item.samplePoint, fontSize - 2, labelFontFamily, perc + 5, 0, "#000", true);
 									}
 								}
 							});
 						}
 					});
-				
+
 					// draw cursor/selected area
 				};
 

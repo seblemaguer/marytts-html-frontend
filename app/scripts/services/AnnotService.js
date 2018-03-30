@@ -12,7 +12,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 		sServObj.annot = undefined;
 
 		sServObj.textGrid = undefined;
+	    sServObj.sampleRate = undefined;
 
+	    sServObj.getSampleRate = function() {
+		return sServObj.sampleRate;
+	    }
 		sServObj.getAnnotLength = function(){
 			if(sServObj.annot){
 				return sServObj.annot.length;
@@ -26,7 +30,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 		* Sets the annotation
 		*/
 		sServObj.setAnnotFromTextGrid = function(text,sampleRate,imposeLength){
-				sServObj.textGrid = text;
+		    sServObj.textGrid = text;
+		    sServObj.sampleRate  = sampleRate;
 				sServObj.convertTextGrid(sampleRate,imposeLength);
 		};
 
