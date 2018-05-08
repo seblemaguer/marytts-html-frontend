@@ -28,6 +28,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	sServObj.listModules = function() {
     	    $("#inputOutputButtonDiv").hide(); //hide the buttons to change input/output
+
+	    // List the modules
 	    $.post(sServObj.getBaseURL() + "listAvailableModulesByCategories/",
 		   {},
 		   function(result) {
@@ -51,9 +53,31 @@ angular.module('MaryTTSHTMLFrontEnd')
 		       }
 
 		       sServObj.listModulesFromCurrentCategory();
-
-
 		   });
+
+	    // List the serializers
+	    $.post(sServObj.getBaseURL() + "listAvailableSerializers/",
+		   {},
+		   function(result) {
+
+		       // Add category
+
+		       $("#categoriesInput").append($('<option>', {
+			   value: "serializer",
+			   text: "serializer",
+			   selected: false
+		       }));
+
+		       var build_list = [];
+		       for (var k in result) {
+			   build_list.push(result[k]);
+		       }
+
+		       sServObj.map_modules["serializer"] = {};
+		       sServObj.map_modules["serializer"]["serializer"] = build_list;
+		   });
+
+
 	};
 
 
@@ -112,6 +136,13 @@ angular.module('MaryTTSHTMLFrontEnd')
 	};
 
 	sServObj.getCurrentModuleDescription = function() {
+
+	    // FIXME: no description support for serializer for now
+	    if($("#categoriesInput").val()==="serializer"){
+		$("#descriptionInput").val("no description");
+		return;
+	    }
+
 	    var module = $("#moduleList option:selected").text();
 	    $.post(sServObj.getBaseURL() + "getDescription/",
 		   {"module": module},
