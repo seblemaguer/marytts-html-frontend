@@ -181,86 +181,67 @@ angular.module('MaryTTSHTMLFrontEnd')
 		    } else {
 			$("#audio_results").collapse('show');
 			$("#server_results").removeClass('border-primary border-success border-danger').addClass('border-success');
-			// FIXME: hardcoded
-			var dur = 71;
-			var sr = 48000;
-			sServObj.loadStaticBuffer(dur*sr, sr);
-			AnnotService.setAnnotFromTextGrid(result_content, sr, dur*sr);
 
 
-			// // FIXME: reintegrate that
-			// var json_result = JSON.parse(result_content);
-			// console.log(json_result);
-			// if (json_result == null) {
-			// 	return;
-			// }
-			// if ("audio" in json_result) {
-			// 	$("#text-result").val(json_result["audio"]);
+			// FIXME:
+			if (sServObj.configuration["marytts.runutils.Request"]["output_serializer"] === "marytts.io.serializer.TextGridSerializer") {
+			    // FIXME: hardcoded
+			    var dur = 71;
+			    var sr = 48000;
+			    sServObj.loadStaticBuffer(dur*sr, sr);
+			    AnnotService.setAnnotFromTextGrid(result_content, sr, dur*sr);
+			} else {
+			    // Parse the result
+			    var json_result;
+			    try {
+				json_result = JSON.parse(result_content);
+				if (json_result == null) {
+				    return;
+				}
+			    } catch (err) {
+				return;
+			    }
 
-			// 	//converts BASE64 to arrayBuffer
-			// 	var tampon = sServObj.BASE64ToArrayBuffer(json_result["audio"]);
+			    if ("audio" in json_result) {
+				//converts BASE64 to arrayBuffer
+				var tampon = sServObj.BASE64ToArrayBuffer(json_result["audio"]);
 
-			// 	//converts arrayBuffer to audioBuffer, which "starts" the app
-			// 	Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-			// 	    sServObj.setAudioBuffer(audioBuffer);
-			// 	}, function (errMess){
-			// 	    console.log("Erreur " + errMess);
-			// 	});
+				//converts arrayBuffer to audioBuffer, which "starts" the app
+				Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
+				    sServObj.setAudioBuffer(audioBuffer);
+				}, function (errMess) {
+				    console.log("Erreur " + errMess);
+				});
 
-			// 	// wavesurfer.loadBlob(blob_wav);
-			// 	$('#pause').prop('disabled', false);
-			// 	$('#play').prop('disabled', false);
-			// 	$('#save').prop('disabled', false);
+				// FIXME: dealing with the texgrid
+				if ("textgrid" in json_result) {
+				    // FI
+				    // Set the textgrid
+				    AnnotService.setAnnotFromTextGrid(json_result["textgrid"],
+								      sServObj.audioBuffer["samplerate"],
+								      sServObj.audioBuffer["length"]);
+				}
 
-			// 	//reset pause button state
-			// 	$('#pause').attr('data-state', 'off');
-			// 	$('#pause-text').text('Pause');
-			// 	$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+				// Enable buttons
+				$('#pause').prop('disabled', false);
+				$('#play').prop('disabled', false);
+				$('#save').prop('disabled', false);
 
+				// Reset pause button state
+				$('#pause').attr('data-state', 'off');
+				$('#pause-text').text('Pause');
+				$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+			    }
+			}
 
-			// } else if (("sequences" in json_result) && ("AUDIO" in json_result["sequences"])) {
-
-			// 	// Extract the wave
-
-			// 	//converts BASE64 to arrayBuffer
-			// 	var tampon = sServObj.BASE64ToArrayBuffer(json_result["sequences"]["AUDIO"][0]["ais"]);
-
-			// 	//converts arrayBuffer to audioBuffer, which "starts" the app
-			// 	Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-			// 	    sServObj.setAudioBuffer(audioBuffer);
-			// 	}, function (errMess){
-			// 	    console.log("Erreur " + errMess);
-			// 	});
-
-			// 	// enable buttons
-			// 	$('#pause').prop('disabled', false);
-			// 	$('#play').prop('disabled', false);
-			// 	$('#save').prop('disabled', false);
-
-			// 	//reset pause button state
-			// 	$('#pause').attr('data-state', 'off');
-			// 	$('#pause-text').text('Pause');
-			// 	$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
-
-			// 	//scroll down to bottom
-			// 	$("html, body").animate({scrollTop: $(document).height()}, 1000);
-			// } else {
-			// 	$("#audio_results_area").prop("display", "none");
-			// } //else if textgrid
-			// /*{
-			//   sServObj.createBuffer();
-			//   var json = "";
-			//   }*/
 		    }
 
 		    if("log" in result){
 			//FIXME : no logs for now
 			$("#log").val(result["log"]);
 		    }
-		}
-		      );
+		});
 	    }
-
 	};
 
 	//Function to create expection trace
@@ -311,7 +292,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 		binary += String.fromCharCode(bytes[i]);
 	    }
 	    var res = window.btoa(binary);
-	    console.log(res);
 	    return res;
 	}
 
@@ -355,7 +335,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	sServObj.loadStaticBuffer= function(dur_frame, sr){
 	    sServObj.staticBuffer = audioCtx.createBuffer(1, dur_frame, sr);
 	    sServObj.setAudioBuffer(sServObj.staticBuffer);
-	}
+	};
 
 	sServObj.setConfiguration = function(newConfig){
 	    if("marytts.runutils.Request" in newConfig){
@@ -370,9 +350,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 		    moduleSequenceService.setOutput(newConfig["marytts.runutils.Request"]["output_serializer"]);
 		}
 	    }
-
-
-	}
+	};
 
 	return sServObj;
     });
