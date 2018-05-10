@@ -136,6 +136,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 	    // Get description
 	    sServObj.getCurrentModuleDescription();
+	    sServObj.getLocalConfiguration();
 	};
 
 	sServObj.getCurrentModuleDescription = function() {
@@ -152,6 +153,12 @@ angular.module('MaryTTSHTMLFrontEnd')
 		   function(result) {
 		       $("#descriptionInput").val(result);
 		   });
+	};
+
+	sServObj.getLocalConfiguration = function() {
+	    var module = $("#moduleList option:selected").text();
+	    var subpart = JSON.stringify(sServObj.configuration[module], null, 4);
+	    $("#configurationModule").val(subpart);
 	};
 
 
@@ -190,14 +197,16 @@ angular.module('MaryTTSHTMLFrontEnd')
 			    // Extract duration
 			    var myRegexp = /^xmax[ ]*=[ ]*([0-9]*.[0-9]*?)$/gm;
 			    var match = myRegexp.exec(result_content);
-			    // FIXME: hardcoded
 			    var dur = match[1];
-			    console.log(dur);
+
+			    // Create fake audio buffer
 			    var sr = 3000;
+			    sServObj.loadStaticBuffer(dur*sr, sr);
+
+			    // Hide unused audio part
 			    $("#osci").hide();
 			    $("#spectro").hide();
 
-			    sServObj.loadStaticBuffer(dur*sr, sr);
 			    AnnotService.setAnnotFromTextGrid(result_content, sr, dur*sr);
 			} else {
 			    // Parse the result
