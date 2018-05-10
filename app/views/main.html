@@ -1,8 +1,9 @@
-<div class="container p-3 mb-2" id="synth_area">
+
+<div class="container-fluid border border-primary rounded p-3 mb-2" id="synth_area">
   <inputtext></inputtext>
 </div>
 
-<div class="container border border-primary rounded p-3 mb-2" id="module_sequence">
+<div class="container-fluid border border-primary rounded p-3 mb-2" id="module_sequence">
   <h4>Module Sequence</h4>
   <!-- Dbl click to add module, dbl click on the module to remove it -->
   <h4 class="text-center"><span class="badge badge-danger">{{mss.input.split(".")[mss.input.split(".").length-1]}}</span>
@@ -26,7 +27,7 @@
     <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
 
       <!-- GUI to add in a directive later -->
-      <div class="container" ng-init="fs.listModules()">
+      <div class="container-fluid" ng-init="fs.listModules()">
         <form class="form-group">
           <div class="form-row">
             <div class="form-group col">
@@ -43,10 +44,10 @@
                     </select></td>
                     <td><select size="4" class="form-control" id="configurationInput" ng-click="fs.listModulesFromCurrentCategoryAndCurrentConf()" ng-dblclick="mss.addModule()">
                     </select></td>
-                    <td><select size="4" class="form-control" id="moduleList" ng-click="fs.getCurrentModuleDescription()" ng-dblclick="mss.addModule()">
+                    <td><select size="4" class="form-control" id="moduleList" ng-click="fs.getLocalConfiguration()" ng-dblclick="mss.addModule()">
                     </select></td>
                     <td>
-                      <textarea class="form-control" id="configurationModule" rows="3">{  }</textarea>
+                      <textarea class="form-control" id="configurationModule" name="configurationModule" rows="3"></textarea>
                     </td>
                   </tr>
                 </tbody>
