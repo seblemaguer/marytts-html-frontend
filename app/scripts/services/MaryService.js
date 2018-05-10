@@ -5,6 +5,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	// shared service object
 	var sServObj = {};
 	sServObj.audioBuffer = undefined;
+	sServObj.textgrid_string = undefined;
 	sServObj.configuration = {
 	    "marytts.runutils.Request": {
 		"input_serializer": "marytts.io.serializer.TextSerializer",
@@ -18,6 +19,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 		]
 	    }
 	};
+
+	sServObj.configuration_string = JSON.stringify(sServObj.configuration);
 
 	sServObj.MARY_HOST = "localhost";
 	sServObj.MARY_PORT = "59125";
@@ -155,12 +158,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 	sServObj.process = function() {
 
 	    var input_text = $("#text-to-synth").val();
-	    var configuration = $("#text-configuration").val();
+	    var configuration = JSON.stringify(sServObj.configuration, null, 4);
+
 	    //validate input text
 	    if (input_text.length === 0) {
 		alert('text needs to be defined !');
-	    } else if (configuration.length == 0) {
-		alert('configuration needs to be defined');
 	    } else {
 
 		$.post(sServObj.getBaseURL() + "process/", {
@@ -168,8 +170,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    	    "configuration": configuration
 		}, function(result) {
 
-	    	    var result_content = result["result"];
-	    	    $("#text-result").val(result_content);
+		    sServObj.textgrid_string = undefined;
+		    var result_content = result["result"];
 
 		    //If an exception occurs
 		    if("exception" in result && result["exception"]!=null){
@@ -179,12 +181,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 
 		    } else {
-			$("#audio_results").collapse('show');
-			$("#server_results").removeClass('border-primary border-success border-danger').addClass('border-success');
-
 
 			// FIXME:
 			if (sServObj.configuration["marytts.runutils.Request"]["output_serializer"] === "marytts.io.serializer.TextGridSerializer") {
+	    		    $("#text-result").val(result_content);
+			    sServObj.textgrid_string = result_content;
 			    // FIXME: hardcoded
 			    var dur = 71;
 			    var sr = 48000;
@@ -193,51 +194,33 @@ angular.module('MaryTTSHTMLFrontEnd')
 			} else {
 			    // Parse the result
 			    var json_result;
-			    try {
-				json_result = JSON.parse(result_content);
-				if (json_result == null) {
-				    return;
-				}
-			    } catch (err) {
+			    if (typeof result_content === 'string' || result_content instanceof String) {
+				$("#text-result").val(result_content);
 				return;
+			    } else {
+				$("#text-result").val(JSON.stringify(result_content));
+				json_result = result_content;
 			    }
 
 			    if ("audio" in json_result) {
-				//converts BASE64 to arrayBuffer
-				var tampon = sServObj.BASE64ToArrayBuffer(json_result["audio"]);
-
-				//converts arrayBuffer to audioBuffer, which "starts" the app
-				Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-				    sServObj.setAudioBuffer(audioBuffer);
-				}, function (errMess) {
-				    console.log("Erreur " + errMess);
-				});
 
 				// FIXME: dealing with the texgrid
 				if ("textgrid" in json_result) {
-				    // FI
-				    // Set the textgrid
-				    AnnotService.setAnnotFromTextGrid(json_result["textgrid"],
-								      sServObj.audioBuffer["samplerate"],
-								      sServObj.audioBuffer["length"]);
+				    sServObj.textgrid_string = json_result["textgrid"];
+				    $("#text-result").val(json_result["textgrid"]);
 				}
 
-				// Enable buttons
-				$('#pause').prop('disabled', false);
-				$('#play').prop('disabled', false);
-				$('#save').prop('disabled', false);
+				// Set the audio buffer
+				sServObj.convertData(json_result["audio"]);
 
-				// Reset pause button state
-				$('#pause').attr('data-state', 'off');
-				$('#pause-text').text('Pause');
-				$('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+				$("#server_results").collapse('show');
+				$("#server_results").removeClass('border-primary border-success border-danger').addClass('border-success');
 			    }
 			}
 
 		    }
 
 		    if("log" in result){
-			//FIXME : no logs for now
 			$("#log").val(result["log"]);
 		    }
 		});
@@ -255,11 +238,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    } else {
 		return str + "\n"+ sServObj.exception_string(result.cause);
 	    }
-	}
+	};
 
 	sServObj.stacktrace_string = function(stacktrace){
 	    return stacktrace.className+"."+stacktrace.methodName+" ("+stacktrace.fileName+":"+stacktrace.lineNumber+") ";
-	}
+	};
 
 	sServObj.getBaseURL = function () {
 	    return "http://" + sServObj.MARY_HOST + ":" + sServObj.MARY_PORT + "/";
@@ -271,13 +254,16 @@ angular.module('MaryTTSHTMLFrontEnd')
 	 */
 	sServObj.convertData = function(b64_wav){
 	    //converts BASE64 to arrayBuffer
-	    var tampon = sServObj.BASE64ToArrayBuffer(b64_wav);
+	    var array = sServObj.BASE64ToArrayBuffer(b64_wav);
 	    //converts arrayBuffer to audioBuffer, which "starts" the app
-	    Wavparserservice.parseWavAudioBuf(tampon).then(function (audioBuffer) {
-		sServObj.setAudioBuffer(audioBuffer);
-	    }, function (errMess){
-		console.log("Erreur " + errMess);
-	    });
+	    var promise = Wavparserservice.parseWavAudioBuf(array);
+	    promise.then(
+		function(audioBuffer) {
+		    sServObj.setAudioBuffer(audioBuffer);
+		},
+		function(error) {
+		    console.log(error);
+		});
 	};
 
 	/**
@@ -293,7 +279,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    }
 	    var res = window.btoa(binary);
 	    return res;
-	}
+	};
 
 	/**
 	 * Converts base64 to ArrayBuffer
@@ -317,8 +303,30 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    sServObj.audioBuffer = newBuffer;
 	    appStateService.setMinMax(0,sServObj.audioBuffer.length);
 	    appStateService.setStartStop(0,sServObj.audioBuffer.length);
+
+	    if (sServObj.textgrid_string != null) {
+		AnnotService.setAnnotFromTextGrid(sServObj.textgrid_string,
+						  sServObj.getAudioBuffer().sampleRate,
+						  sServObj.getAudioBuffer().length);
+
+	    }
+
+
+	    // Enable buttons
+	    $('#pause').prop('disabled', false);
+	    $('#play').prop('disabled', false);
+	    $('#save').prop('disabled', false);
+
+	    // Reset pause button state
+	    $('#pause').attr('data-state', 'off');
+	    $('#pause-text').text('Pause');
+	    $('#pause-icon').removeClass('glyphicon-play').addClass('glyphicon-pause');
+
+	    // Show the results
+	    $("#audio_results").collapse('show');
+
 	    //Something has changed, so we call $apply manually
-	    //$rootScope.$apply();
+	    $rootScope.$apply();
 	};
 
 
@@ -337,6 +345,9 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    sServObj.setAudioBuffer(sServObj.staticBuffer);
 	};
 
+	sServObj.setConfigurationString = function(newConfig){
+	    sServObj.configuration_string = newConfig;
+	};
 	sServObj.setConfiguration = function(newConfig){
 	    if("marytts.runutils.Request" in newConfig){
 		if("module_sequence" in newConfig["marytts.runutils.Request"]){
@@ -350,6 +361,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 		    moduleSequenceService.setOutput(newConfig["marytts.runutils.Request"]["output_serializer"]);
 		}
 	    }
+	    sServObj.setConfigurationString(JSON.stringify(newConfig));
 	};
 
 	return sServObj;
