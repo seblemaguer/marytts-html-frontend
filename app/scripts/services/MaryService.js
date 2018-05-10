@@ -186,9 +186,17 @@ angular.module('MaryTTSHTMLFrontEnd')
 			if (sServObj.configuration["marytts.runutils.Request"]["output_serializer"] === "marytts.io.serializer.TextGridSerializer") {
 	    		    $("#text-result").val(result_content);
 			    sServObj.textgrid_string = result_content;
+
+			    // Extract duration
+			    var myRegexp = /^xmax[ ]*=[ ]*([0-9]*.[0-9]*?)$/gm;
+			    var match = myRegexp.exec(result_content);
 			    // FIXME: hardcoded
-			    var dur = 71;
-			    var sr = 48000;
+			    var dur = match[1];
+			    console.log(dur);
+			    var sr = 3000;
+			    $("#osci").hide();
+			    $("#spectro").hide();
+
 			    sServObj.loadStaticBuffer(dur*sr, sr);
 			    AnnotService.setAnnotFromTextGrid(result_content, sr, dur*sr);
 			} else {
@@ -204,7 +212,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 
 			    if ("audio" in json_result) {
 
-				// FIXME: dealing with the texgrid
+				// Show just to be sure :)
+				$("#osci").show();
+				$("#spectro").show();
+
+				// Dealing with the potential textgrid
 				if ("textgrid" in json_result) {
 				    sServObj.textgrid_string = json_result["textgrid"];
 				    $("#text-result").val(json_result["textgrid"]);
@@ -325,8 +337,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    // Show the results
 	    $("#audio_results").collapse('show');
 
-	    //Something has changed, so we call $apply manually
-	    $rootScope.$apply();
+	    // //Something has changed, so we call $apply manually
+	    // $rootScope.$apply();
 	};
 
 
