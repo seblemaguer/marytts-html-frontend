@@ -16,12 +16,9 @@ angular.module('MaryTTSHTMLFrontEnd')
 					if(newVal!==oldVal){
 						$("#shifting_bar").val(newVal);
 						var currentRatio = 100-parseInt((scope.app.getStop()-scope.app.getStart())/(scope.app.stopMax-scope.app.startMin)*100);
-						console.log(currentRatio);
 						$("#zooming_bar").val(currentRatio);
 					}
 				});
-
-				scope
 
 				scope.zoomIn = function(){
 					//if start / stop !== undefined
@@ -40,7 +37,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 						var distance = scope.app.getStop()-scope.app.getStart();
 						var distance2 = distance * 4/3; //dezoom of 25%
 						scope.app.setStartStop(scope.app.getStart()-(distance2-distance)*0.5,scope.app.getStop()+(distance2-distance)*0.5);
-	
+
 					}
 				};
 
@@ -108,7 +105,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 						} else {
 							scope.app.setStartStop(value,end);
 						}
-					}					
+					}
 				}
 
 				scope.play = function(){
