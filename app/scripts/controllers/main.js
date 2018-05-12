@@ -11,6 +11,7 @@ angular.module('MaryTTSHTMLFrontEnd')
     .controller('MainCtrl', function ($scope,$rootScope,$location, MaryService, moduleSequenceService,AnnotService) {
 
 
+
 	// Services
   	$scope.fs = MaryService;
   	$scope.mss = moduleSequenceService;
@@ -32,8 +33,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 	        $scope.fs.configuration["marytts.runutils.Request"]["module_sequence"] = $scope.mss.moduleSequence;
 		var buffer = JSON.stringify($scope.fs.configuration, null, 4);
 
-		var editor = ace.edit("configuration");
-	        editor.setValue(buffer);
+		if (buffer !== $scope.configuration_editor.getValue()) {
+		    var editor = ace.edit("configuration");
+	            editor.setValue(buffer);
+		}
 	    }
 	},true);
 
@@ -42,8 +45,10 @@ angular.module('MaryTTSHTMLFrontEnd')
 	        $scope.fs.configuration["marytts.runutils.Request"]["input_serializer"] = $scope.mss.input;
 		var buffer = JSON.stringify($scope.fs.configuration, null, 4);
 
-		var editor = ace.edit("configuration");
-	        editor.setValue(buffer);
+		if (buffer !== $scope.configuration_editor.getValue()) {
+		    var editor = ace.edit("configuration");
+	            editor.setValue(buffer);
+		}
 	    }
 	});
 
@@ -52,8 +57,11 @@ angular.module('MaryTTSHTMLFrontEnd')
 	        $scope.fs.configuration["marytts.runutils.Request"]["output_serializer"] = $scope.mss.output;
 		var buffer = JSON.stringify($scope.fs.configuration, null, 4);
 
-		var editor = ace.edit("configuration");
-	        editor.setValue(buffer);
+
+		if (buffer !== $scope.configuration_editor.getValue()) {
+		    var editor = ace.edit("configuration");
+	            editor.setValue(buffer);
+		}
 	    }
 	});
 
