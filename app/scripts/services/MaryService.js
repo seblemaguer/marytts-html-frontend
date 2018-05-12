@@ -20,8 +20,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    }
 	};
 
-	sServObj.configuration_string = JSON.stringify(sServObj.configuration);
-
 	sServObj.MARY_HOST = "localhost";
 	sServObj.MARY_PORT = "59125";
 	sServObj.map_modules = null;
@@ -165,7 +163,7 @@ angular.module('MaryTTSHTMLFrontEnd')
 	sServObj.process = function() {
 
 	    var input_text = $("#text-to-synth").val();
-	    var configuration = JSON.stringify(sServObj.configuration, null, 4);
+	    var configuration = JSON.stringify(sServObj.configuration);
 
 	    //validate input text
 	    if (input_text.length === 0) {
@@ -366,14 +364,14 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    sServObj.setAudioBuffer(sServObj.staticBuffer);
 	};
 
-	sServObj.setConfigurationString = function(newConfig){
-	    sServObj.configuration_string = newConfig;
-	};
+
 	sServObj.setConfiguration = function(newConfig){
 	    if("marytts.runutils.Request" in newConfig){
+
+		sServObj.configuration = newConfig;
+
 		if("module_sequence" in newConfig["marytts.runutils.Request"]){
 		    moduleSequenceService.setModuleSequence(newConfig["marytts.runutils.Request"]["module_sequence"]);
-		    sServObj.configuration = newConfig;
 		}
 		if("input_serializer" in newConfig["marytts.runutils.Request"]){
 		    moduleSequenceService.setInput(newConfig["marytts.runutils.Request"]["input_serializer"]);
@@ -382,7 +380,6 @@ angular.module('MaryTTSHTMLFrontEnd')
 		    moduleSequenceService.setOutput(newConfig["marytts.runutils.Request"]["output_serializer"]);
 		}
 	    }
-	    sServObj.setConfigurationString(JSON.stringify(newConfig));
 	};
 
 	return sServObj;

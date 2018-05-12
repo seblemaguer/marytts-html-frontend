@@ -1,5 +1,13 @@
 <div class="form-group" id="text_area">
-    <label for="text-configuration" class="h4">User configuration of the system</label>
-    <textarea id="text-configuration" rows="6" name="configuration"
-	      tabindex="1" class="form-control code" smart-area="areaConfig" ng-model="configuration"></textarea>
+  <label for="text-configuration" class="h4">User configuration of the system</label>
+  <div id="configuration" name="configuration"
+       ui-ace="{
+	   useWrapMode : true,
+	   showGutter: true,
+	   theme:'github',
+	   mode: 'json',
+	   onChange:aceChanged
+	   }"
+       ng-model="configuration_code" ng-controller="configurationCtrl">
+  </div>
 </div>

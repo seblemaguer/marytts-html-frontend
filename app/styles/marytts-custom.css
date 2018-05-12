@@ -72,3 +72,5 @@
 .border-success {
   border-width : 5px !important;
 }
+
+.ace_editor { height: 200px; }
