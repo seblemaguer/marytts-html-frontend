@@ -1,13 +1,112 @@
-<div class="form-group" id="text_area">
-  <label for="text-configuration" class="h4">User configuration of the system</label>
-  <div id="configuration" name="configuration"
-       ui-ace="{
-	   useWrapMode : true,
-	   showGutter: true,
-	   theme:'github',
-	   mode: 'json',
-	   onChange:aceChanged
-	   }"
-       ng-model="configuration_code" ng-controller="configurationCtrl">
+
+<div class="container-fluid border border-primary rounded p-3 mb-2" id="module_sequence">
+  <h4>Module Sequence</h4>
+  <!-- Dbl click to add module, dbl click on the module to remove it -->
+  <h4 class="text-center"><span class="badge badge-danger">{{mss.input.split(".")[mss.input.split(".").length-1]}}</span>
+    <span ng-repeat="module in mss.moduleSequence track by $index">
+      <i class="fas fa-arrow-right"></i><span class="badge badge-primary" ng-dblclick="mss.removeModule($index)">{{module.split(".")[module.split(".").length-1]}} </span>
+    </span>
+    <i class="fas fa-arrow-right"></i><span class="badge badge-danger">{{mss.output.split(".")[mss.output.split(".").length-1]}}</span>
+  </h4>
+  <p class="text-secondary"><small>Double click on a module to remove it. You can't remove <span class="badge badge-danger">red modules</span> but you can replace them.</small></p>
+
+  <ul class="nav nav-tabs" id="configtab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link" id="configgui-tab" data-toggle="tab" href="#configgui" role="tab"  aria-controls="configgui" aria-selected="false">Module list</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="configtext-tab" data-toggle="tab" href="#configtext" role="tab" aria-controls="configtext" aria-selected="false" ng-click="configurationCtrl.render = true">Manual configuration</a>
+    </li>
+  </ul>
+  <br />
+  <div class="tab-content" id="configtabContent">
+    <div class="tab-pane active" id="configgui" role="tabpanel" aria-labelledby="configgui-tab">
+
+      <!-- GUI to add in a directive later -->
+      <div class="container-fluid" ng-init="ms.listModules()">
+        <form class="form-group">
+          <div class="form-row">
+            <div class="form-group col">
+              <table class="table">
+                <thead>
+                  <th>Categories</th>
+		  <th>Preset</th>
+                  <th>Module list</th>
+                  <th>Configuration</th>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><select size="4" class="form-control" id="categoriesInput" ng-click="ms.listModulesFromCurrentCategory()" style="height:200px;">
+                    </select></td>
+                    <td><select size="4" class="form-control" id="configurationInput" ng-click="ms.listModulesFromCurrentCategoryAndCurrentConf()" ng-dblclick="mss.addModule()" style="height:200px;">
+                    </select></td>
+                    <td><select size="4" class="form-control" id="moduleList" ng-click="ms.getLocalConfiguration()" ng-dblclick="mss.addModule()" style="height:200px;">
+                    </select></td>
+                    <td>
+		      <div id="configurationModule" name="configurationModule"
+			   ui-ace="{
+			       useWrapMode : true,
+			       showGutter: true,
+			       theme:'github',
+			       mode: 'json',
+			       onChange:aceModuleChanged
+			       }"
+			   ng-model="configuration_module_code">
+		      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+	    </div>
+	  </div>
+      </div>
+
+      <!-- Add ng-if to check which category is selected, in order to display different buttons if it is serializer-->
+      <span class="form-group col" id="moduleButtonDiv">
+        <button class="btn btn-primary" type="button" id="addModuleButton" ng-click="mss.addModule()">Add the selected module</button>
+      </span>
+      <span class="form-group col" id="inputOutputButtonDiv">
+        <button class="btn btn-danger" type="button" id="inputButton" ng-click="mss.setInputFromButton()">Set selected module as input</button>
+        <button class="btn btn-danger" type="button" id="outputButton" ng-click="mss.setOutputFromButton()">Set selected module as output</button>
+      </span>
+      <button class="btn btn-primary" type="button" id="showDescription" data-toggle="modal" data-target="#descriptionModal">Show description</button>
+
+        </form>
+    </div>
+
+    <div class="tab-pane" id="configtext" role="tabpanel" aria-labelledby="configtext-tab">
+      <label for="text-configuration" class="h4">User configuration of the system</label>
+      <div id="configuration" name="configuration"
+	   ng-if="configuratonCtrl.render"
+	   ui-ace="{
+	       useWrapMode : true,
+	       showGutter: true,
+	       theme:'github',
+	       mode: 'json',
+	       onChange:aceChanged
+	       }"
+	   ng-model="configuration_code">
+      </div>
+    </div>
+  </div>
+
+  <!-- Description module -->
+  <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+	<div class="modal-header">
+          <h5 class="modal-title" id="descriptionModalLabel">Module description</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+	</div>
+	<div class="modal-body">
+          <p>Description of the selected module.</p>
+	</div>
+	<div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	</div>
+      </div>
+    </div>
   </div>
 </div>

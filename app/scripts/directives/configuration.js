@@ -1,3 +1,4 @@
+
 'use strict';
 
 angular.module('MaryTTSHTMLFrontEnd')
@@ -6,6 +7,8 @@ angular.module('MaryTTSHTMLFrontEnd')
 	    templateUrl: 'views/configuration.html',
 	    restrict: 'E',
 	    replace: true,
-	    scope: {configuration : '='}
+	    scope: {configuration : '='},
+            controller: 'ConfigurationCtrl',
+            controllerAs: 'configuration'
 	};
     });

@@ -8,7 +8,7 @@
  * Controller of the testApp
  */
 angular.module('MaryTTSHTMLFrontEnd')
-  .controller('runCtrl', function ($scope,$rootScope, MaryService) {
+    .controller('runCtrl', function ($scope,$rootScope, MaryService) {
 	$scope.process = function() {
             MaryService.process();
 	};
