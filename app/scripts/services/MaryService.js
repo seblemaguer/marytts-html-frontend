@@ -7,18 +7,39 @@ angular.module('MaryTTSHTMLFrontEnd')
 	sServObj.audioBuffer = undefined;
 	sServObj.textgrid_string = undefined;
 	sServObj.configuration = {
-	    "marytts.runutils.Request": {
-		"input_serializer": "marytts.io.serializer.TextSerializer",
-		"output_serializer": "marytts.io.serializer.TextGridSerializer",
-		"module_sequence": [
-		    "marytts.language.en.JTokenizer",
-		    "marytts.language.en.Preprocess",
-		    "marytts.language.en.OpenNLPPosTagger",
-		    "marytts.language.en.USJPhonemiser",
-		    "marytts.modules.dummies.DurationPrediction"
-		]
-	    }
-	};
+            "marytts.runutils.Request": {
+                "input_serializer": "marytts.io.serializer.TextSerializer",
+                "output_serializer": "marytts.io.serializer.TextGridAudioSerializer",
+                "module_sequence": [
+                    "marytts.language.en.JTokenizer",
+                    "marytts.language.en.Preprocess",
+                    "marytts.language.en.OpenNLPPosTagger",
+                    "marytts.modules.nlp.ProsodyGeneric",
+                    "marytts.g2pdnn.G2PDNNModule",
+                    "marytts.modules.acoustic.TargetFeatureLister",
+                    "marytts.modules.BlizzardDNNDurationPrediction",
+                    "marytts.modules.IntonationPrediction",
+                    "marytts.modules.SegmentalSynthesizer",
+                    "marytts.modules.SPTK",
+                    "marytts.jworld.JWorldModule"
+                ]
+            },
+            "marytts.modules.BlizzardDNNDurationPrediction": {
+                "predictor_model": "build/duration/",
+                "normaliser": "QuinphoneNormaliser"
+            },
+            "marytts.modules.IntonationPrediction": {
+                "hostname": "localhost",
+                "port": "8850"
+            },
+            "marytts.modules.SegmentalSynthesizer": {
+                "hostname": "localhost",
+                "port": "8895"
+            },
+            "marytts.jworld.JWorldModule": {
+                "as_short": true
+            }
+        };
 
 	sServObj.configuration_string = JSON.stringify(sServObj.configuration);
 
