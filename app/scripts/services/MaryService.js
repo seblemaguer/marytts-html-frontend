@@ -38,8 +38,20 @@ angular.module('MaryTTSHTMLFrontEnd')
             },
             "marytts.jworld.JWorldModule": {
                 "as_short": true
+            },
+            "marytts.io.serializer.TextGridAudioSerializer": {
+                "ignored_sequences": [
+                    "WORLD_APERIODICITY",
+                    "WORLD_SPECTRUM",
+                    "AUDIO",
+                    "F0",
+                    "F0Masked",
+                    "MGC",
+                    "BAP"
+                ]
             }
-        };
+        }
+        ;
 
 	sServObj.configuration_string = JSON.stringify(sServObj.configuration);
 
