@@ -7,18 +7,29 @@ angular.module('MaryTTSHTMLFrontEnd')
 	sServObj.audioBuffer = undefined;
 	sServObj.textgrid_string = undefined;
 	sServObj.configuration = {
-	    "marytts.runutils.Request": {
-		"input_serializer": "marytts.io.serializer.TextSerializer",
-		"output_serializer": "marytts.io.serializer.TextGridSerializer",
-		"module_sequence": [
-		    "marytts.language.en.JTokenizer",
-		    "marytts.language.en.Preprocess",
-		    "marytts.language.en.OpenNLPPosTagger",
-		    "marytts.language.en.USJPhonemiser",
-		    "marytts.modules.dummies.DurationPrediction"
-		]
-	    }
-	};
+                "marytts.runutils.Request": {
+                    "input_serializer": "marytts.io.serializer.TextSerializer",
+                    "output_serializer": "marytts.io.serializer.TextGridAudioSerializer",
+                    "module_sequence": [
+                        "marytts.language.en.JTokenizer",
+                        "marytts.language.en.Preprocess",
+                        "marytts.language.en.OpenNLPPosTagger",
+                        "marytts.language.en.USJPhonemiser",
+                        "marytts.language.en.Prosody",
+                        "marytts.modules.acoustic.TargetFeatureLister",
+                        "marytts.htsengine.HTSEngineModule"
+                    ]
+                },
+                "marytts.io.serializer.TextGridAudioSerializer": {
+                    "ignored_sequences": [
+                        "AUDIO",
+                        "PHRASE",
+                        "WORD",
+                        "FEATURES",
+                        "SYLLABLE"
+                    ]
+                }
+            };
 
 	sServObj.configuration_string = JSON.stringify(sServObj.configuration);
 
